@@ -1,0 +1,112 @@
+@import url("https://fonts.googleapis.com/css2?family=Funnel+Sans:ital,wght@0,300..800;1,300..800&family=JetBrains+Mono:ital,wght@0,100..800;1,100..800&family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap");
+
+:root
+{
+    background-image: radial-gradient(#444 50%, #333 50%);
+
+    --font-code: "JetBrains Mono", monospace;
+    --font-small: "Montserrat", sans-serif;
+    --font-normal: "Funnel Sans", sans-serif;
+    font-family: var(--font-normal);
+    color: var(--color-line);
+}
+
+@property --x { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+@keyframes linear-var-x
+{
+    from { --x: 0 }
+    to { --x: 1 }
+}
+
+@property --w { syntax: "<number>"; inherits: true; initial-value: 1; }
+
+.panel
+{
+    padding: 4px;
+    border-radius: 8px;
+    border: 2px solid #FFF3;
+    position: relative;
+    background: linear-gradient(to bottom, #FFF3, #FFF2);
+    backdrop-filter: blur(4px);
+    box-shadow: 0 4px 32px #0002, inset 0 4px 8px #0002;
+
+    & > hr
+    {
+        appearance: none;
+        border: 2px solid transparent;
+        border-top: 2px solid #FFF3;
+    }
+}
+
+.manual-shine, .shine
+{
+    position: relative;
+
+    &::after
+    {
+        content: "";
+        margin: -2px;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(
+            135deg,
+            transparent calc(((-50px - 20%) * var(--w)) + (var(--x) * 200vmax)),
+            #FFF calc(((-50px - 20%) * var(--w)) + 1vmax + (var(--x) * 200vmax)),
+            #FFF calc(0px - 1vmax + (var(--x) * 200vmax)),
+            transparent calc(0px + (var(--x) * 200vmax)))
+            border-box;
+        mask:
+            linear-gradient(to bottom, #FFF, #FFF8) border-box subtract,
+            linear-gradient(#FFF, #FFF) padding-box;
+        pointer-events: none;
+    }
+
+    &::before
+    {
+        content: "";
+        margin: -2px;
+        border: 2px solid transparent;
+        border-radius: 8px;
+        position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+        background: linear-gradient(
+            135deg,
+            transparent calc(((-50px - 20%) * var(--w)) + (var(--x) * 200vmax)),
+            #FFF6 calc(((-50px - 20%) * var(--w)) + 1vmax + (var(--x) * 200vmax)),
+            #FFF6 calc(0px - 1vmax + (var(--x) * 200vmax)),
+            transparent calc(0px + (var(--x) * 200vmax)))
+            border-box;
+        mask:
+            linear-gradient(to bottom, #FFF, #FFF2) border-box;
+        pointer-events: none;
+    }
+}
+
+.shine
+{
+    &::after { animation: linear-var-x 3.5s linear infinite }
+    &::before { animation: linear-var-x 3.5s linear infinite }
+}
+
+.variant-slide
+{
+    opacity: 1;
+
+    &.hidden
+    {
+        opacity: 0;
+        pointer-events: none;
+    }
+}
+
+variant-div
+{
+    display: grid;
+
+    & > *
+    {
+        grid-row: 1;
+        grid-column: 1;
+    }
+}
