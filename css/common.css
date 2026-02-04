@@ -8,60 +8,172 @@
     --font-small: "Montserrat", sans-serif;
     --font-normal: "Funnel Sans", sans-serif;
     font-family: var(--font-normal);
-    color: var(--color-line);
+    color: #FFF;
+    color-scheme: dark;
 }
 
-@property --x { syntax: "<number>"; inherits: true; initial-value: 0; }
+@property --shine { syntax: "<number>"; inherits: true; initial-value: 0; }
 
-@keyframes linear-var-x
+@keyframes linear-shine
 {
-    from { --x: 0 }
-    to { --x: 1 }
+    from { --shine: 0.0 }
+    to { --shine: 1.0 }
 }
 
-@property --w { syntax: "<number>"; inherits: true; initial-value: 1; }
+@property --progress { syntax: "<number>"; inherits: true; initial-value: 0; }
+
+@keyframes linear-progress
+{
+    from { --progress: 0.0 }
+    to { --progress: 1.0 }
+}
 
 .panel
 {
     padding: 4px;
+    border: 2px solid #666;
     border-radius: 8px;
-    border: 2px solid #FFF3;
-    position: relative;
-    background: linear-gradient(to bottom, #FFF3, #FFF2);
-    backdrop-filter: blur(4px);
-    box-shadow: 0 4px 32px #0002, inset 0 4px 8px #0002;
+    background: linear-gradient(to bottom, #555, #444);
+    box-shadow: 0 4px 32px #0002, inset 0 -4px 8px #0002;
+
+    &.center
+    {
+        text-align: center;
+    }
 
     & > hr
     {
         appearance: none;
         border: 2px solid transparent;
-        border-top: 2px solid #FFF3;
+        border-top: 2px solid #666;
+    }
+}
+
+input[type="text"], input[type="email"], input[type="password"]
+{
+    margin: 6px 4px 2px;
+    padding: 4px;
+    border: 2px solid #666;
+    max-width: calc(100px + 20vw);
+    border-radius: 8px;
+    position: relative;
+    background: linear-gradient(to bottom, #444, #444);
+    appearance: none;
+    box-shadow: inset 0 4px 8px #0004;
+    font-size: large;
+    text-shadow: 0 2px 8px #0008;
+
+    &:hover, &:focus-visible
+    {
+        border-color: #CCC;
+    }
+}
+
+input[type="button"], input[type="submit"], button
+{
+    margin: 6px 4px 2px;
+    padding: 4px;
+    border: 2px solid #666;
+    max-width: calc(100px + 20vw);
+    border-radius: 8px;
+    position: relative;
+    background: linear-gradient(to bottom, #444, #444);
+    appearance: none;
+    box-shadow: 0 4px 8px #0004;
+    font-size: large;
+    text-shadow: 0 2px 8px #0008;
+
+    &:hover, &:focus-visible
+    {
+        border-color: #CCC;
+    }
+
+    &:active
+    {
+        border-color: #666;
+    }
+}
+
+@media not (prefers-reduced-transparency), all
+{
+    .glass.panel
+    {
+        border-color: #AAA6;
+        background: linear-gradient(to bottom, #AAA6, #AAA4);
+        backdrop-filter: blur(4px);
+        box-shadow: 0 4px 32px #0004, inset 0 4px 8px #0002;
+
+        & > hr
+        {
+            border-top-color: #AAA6;
+        }
+
+        & > *
+        {
+            text-shadow: 0 2px 8px #0008;
+        }
+    }
+
+    .glass:is(input[type="text"], input[type="email"], input[type="password"])
+    {
+        border-color: #AAA6;
+        background: linear-gradient(to bottom, #AAA6, #AAA4);
+        box-shadow: inset 0 4px 16px #0004;
+        text-shadow: 0 2px 8px #0008;
+
+        .panel.glass &
+        {
+            background: transparent;
+        }
+
+        &:hover, &:focus-visible
+        {
+            border-color: #CCC;
+        }
+    }
+
+    .glass:is(input[type="button"], input[type="submit"], button)
+    {
+        border-color: #AAA6;
+        background: linear-gradient(to bottom, #AAA6, #AAA4);
+        box-shadow: 0 4px 16px #0004;
+        text-shadow: 0 2px 8px #0008;
+
+        &:hover, &:focus-visible
+        {
+            border-color: #CCC;
+        }
+
+        &:active
+        {
+            border-color: #AAA6;
+        }
+    }
+}
+
+@media not (prefers-reduced-motion), all
+{
+    input[type="text"], input[type="email"], input[type="password"],
+    input[type="button"], input[type="submit"], button
+    {
+        transition:
+            margin-inline ease-out 0.2s,
+            padding-inline ease-out 0.2s;
+
+        &:hover, &:focus-visible
+        {
+            margin-inline: 0px;
+            padding-inline: 8px;
+            transition:
+                margin-inline ease-out 0.1s,
+                padding-inline ease-out 0.1s;
+        }
     }
 }
 
 .manual-shine, .shine
 {
     position: relative;
-
-    &::after
-    {
-        content: "";
-        margin: -2px;
-        border: 2px solid transparent;
-        border-radius: 8px;
-        position: absolute; top: 0; bottom: 0; left: 0; right: 0;
-        background: linear-gradient(
-            135deg,
-            transparent calc(((-50px - 20%) * var(--w)) + (var(--x) * 200vmax)),
-            #FFF calc(((-50px - 20%) * var(--w)) + 1vmax + (var(--x) * 200vmax)),
-            #FFF calc(0px - 1vmax + (var(--x) * 200vmax)),
-            transparent calc(0px + (var(--x) * 200vmax)))
-            border-box;
-        mask:
-            linear-gradient(to bottom, #FFF, #FFF8) border-box subtract,
-            linear-gradient(#FFF, #FFF) padding-box;
-        pointer-events: none;
-    }
 
     &::before
     {
@@ -72,28 +184,28 @@
         position: absolute; top: 0; bottom: 0; left: 0; right: 0;
         background: linear-gradient(
             135deg,
-            transparent calc(((-50px - 20%) * var(--w)) + (var(--x) * 200vmax)),
-            #FFF6 calc(((-50px - 20%) * var(--w)) + 1vmax + (var(--x) * 200vmax)),
-            #FFF6 calc(0px - 1vmax + (var(--x) * 200vmax)),
-            transparent calc(0px + (var(--x) * 200vmax)))
+            transparent calc((-100px - 20%) + (var(--shine) * 200vmax)),
+            #FFF calc((-100px - 20%) + 1vmax + (var(--shine) * 200vmax)),
+            #FFF calc(0px - 1vmax + (var(--shine) * 200vmax)),
+            transparent calc(0px + (var(--shine) * 200vmax)))
             border-box;
         mask:
-            linear-gradient(to bottom, #FFF, #FFF2) border-box;
+            linear-gradient(to bottom, #FFF, #FFF8) border-box subtract,
+            linear-gradient(to bottom, #FFFA, #FFFE) padding-box;
         pointer-events: none;
     }
 }
 
 .shine
 {
-    &::after { animation: linear-var-x 3.5s linear infinite }
-    &::before { animation: linear-var-x 3.5s linear infinite }
+    &::before { animation: linear-shine 3.5s linear infinite }
 }
 
 .variant-slide
 {
     opacity: 1;
 
-    &.hidden
+    &.variant-slide-hidden
     {
         opacity: 0;
         pointer-events: none;

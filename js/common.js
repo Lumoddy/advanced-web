@@ -4,17 +4,13 @@
  * `manual-shine`.
 @param {Animatable} element
 @param {number} duration
-@param {number} scale
 @returns {Animation}
-*/ export function manualShine(element, duration = 500, scale = 2)
+*/ export function manualShine(element, duration = 500)
 {
     return element.animate(
-    [
-        { "--x": 0, "--w": scale },
-        { "--x": 1, "--w": scale },
-    ],
-    {
-        duration,
-        iterations: 1,
-    });
+        [{ "--shine": 0 }, { "--shine": 1 }],
+        {
+            duration,
+            iterations: 1,
+        });
 }
