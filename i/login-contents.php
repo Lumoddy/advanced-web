@@ -1,6 +1,5 @@
 <script type="module">
-
-    import { manualShine } from "/js/common.js";
+    import { manualShine, postNewAccount, fetchLogin } from "./js/common.js";
 
     function variantSlideHide(element)
     {
@@ -43,6 +42,7 @@
         document.querySelectorAll("#create-account-form [tabindex], #login-instead")
             .forEach((x) => x.tabIndex = -1);
         document.querySelector("#login-form input").focus();
+        document.querySelector("#create-account-form .error").textContent = "";
         manualShine(document.getElementById("login-form").parentElement.parentElement);
     }
 
@@ -57,14 +57,12 @@
         document.querySelectorAll("#login-form [tabindex], #create-account-instead")
             .forEach((x) => x.tabIndex = -1);
         document.querySelector("#create-account-form input").focus();
+        document.querySelector("#login-form .error").textContent = "";
         manualShine(document.getElementById("login-form").parentElement.parentElement);
     }
 
     window.addEventListener("popstate", (e) =>
     {
-        if (!/^\/login.php(?:$|\/)/.test(location.pathname))
-            return;
-
         if (new URLSearchParams(location.search).get("new") === null)
             variantToLogin();
         else
@@ -88,9 +86,80 @@
             history.pushState(history.state, "", `/login.php?new<?php
                 if (is_string($redirect)) echo "&r=".urlencode($redirect);
             ?>`);
-            variantToCreateAccount();
+            variantToCreateAccount()
         });
 
+    document.getElementById("login-submit")
+        .addEventListener("click", (e) =>
+        {
+            e.target.disable = true;
+            e.preventDefault();
+            fetchLogin(document.getElementById("login-form"))
+                .then((x) =>
+                {
+                    if ("error" in x)
+                    {
+                        document.querySelector("#login-form .error")
+                            .textContent = x.message;
+                    }
+                    else
+                    {
+                        const wrapper = document.getElementById("login-form")
+                            .parentElement.parentElement;
+
+                        if (wrapper instanceof HTMLDialogElement)
+                            wrapper.close(String(x.id));
+                        else
+                            e.target.click();
+                    }
+                })
+                .catch((x) =>
+                {
+                    console.error(x);
+                    document.querySelector("#login-form .error")
+                        .textContent = "An unknown error occurred, try again later.";
+                })
+                .then(() =>
+                {
+                    e.target.disable = false;
+                });
+        });
+
+    document.getElementById("create-account-submit")
+        .addEventListener("click", (e) =>
+        {
+            e.target.disable = true;
+            e.preventDefault();
+            postNewAccount(document.getElementById("create-account-form"))
+                .then((x) =>
+                {
+                    if ("error" in x)
+                    {
+                        document.querySelector("#create-account-form .error")
+                            .textContent = x.message;
+                    }
+                    else
+                    {
+                        const wrapper = document.getElementById("create-account-form")
+                            .parentElement.parentElement;
+
+                        if (wrapper instanceof HTMLDialogElement)
+                            wrapper.close(String(x.id));
+                        else
+                            e.target.click();
+                    }
+                })
+                .catch((x) =>
+                {
+                    console.error(x);
+                    document.querySelector("#create-account-form .error")
+                        .textContent = "An unknown error occurred, try again later.";
+                })
+                .then(() =>
+                {
+                    e.target.disable = false;
+                });
+        });
 </script>
 <variant-div>
   <form
@@ -98,6 +167,7 @@
     class="login-variant variant-slide<?php
         if ($new) echo " variant-slide-hidden";
     ?>"
+    action=""
     method="post">
     <h1>Login</h1>
     <p>
@@ -108,6 +178,7 @@
         name="email"
         type="email"
         class="glass"
+
         autocomplete="email"
         tabindex="<?php echo $new ? -1 : 0 ?>">
     </p>
@@ -122,7 +193,12 @@
         autocomplete="password"
         tabindex="<?php echo $new ? -1 : 0 ?>">
     </p>
+    <p class="error"><?php
+        if (is_string($createAccountError))
+            echo $createAccountError;
+    ?></p>
     <button
+      id="login-submit"
       type="submit"
       class="glass"
       tabindex="<?php echo $new ? -1 : 0 ?>">Login</button>
@@ -168,7 +244,12 @@
         tabindex="<?php echo $new ? 0 : -1 ?>">
     </p>
     <input type="hidden" name="new" value="">
+    <p class="error"><?php
+        if (is_string($loginError))
+            echo $loginError;
+    ?></p>
     <button
+      id="create-account-submit"
       type="submit"
       class="glass"
       tabindex="<?php echo $new ? 0 : -1 ?>">Create Account</button>

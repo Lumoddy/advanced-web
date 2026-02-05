@@ -1,7 +1,8 @@
 <?php
-    declare(strict_types=1);
+    require_once $_SERVER['DOCUMENT_ROOT']."/i/accounts.php";
     $redirect = $_GET["r"];
     $new = isset($_GET["new"]);
+    session_start();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -13,7 +14,7 @@
 </head>
 <body>
   <section class="panel glass center manual-shine" id="login-or-create-account">
-    <?php require "./i/login-contents.php" ?>
+    <?php require $_SERVER['DOCUMENT_ROOT']."/i/login-contents.php" ?>
   </section>
 </body>
 </html>
