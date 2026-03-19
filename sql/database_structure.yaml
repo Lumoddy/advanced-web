@@ -1,0 +1,61 @@
+replacements:
+  - - { type: ID }
+    - { type: INT, signed: false }
+tables:
+  images:
+    columns:
+    - { name: id, type: ID, nullable: false }
+    - { name: description, type: VARCHAR, size: 1023, nullable: false }
+    constraints:
+    - primary: [id]
+  accounts:
+    columns:
+    - { name: id, type: ID, nullable: false }
+    - { name: username, type: VARCHAR, size: 127, nullable: false }
+    - { name: email, type: VARCHAR, size: 255, nullable: false }
+    - { name: password_hash, type: VARCHAR, size: 255, nullable: false }
+    constraints:
+    - primary: [id]
+    - unique: [email]
+  media:
+    columns:
+    - { name: id, type: ID, nullable: false }
+    - { name: title, type: VARCHAR, size: 1023, nullable: false }
+    - { name: description, type: VARCHAR, size: 4095, nullable: false }
+    - { name: cover, type: INT, signed: false, nullable: false }
+    constraints:
+    - primary: [id]
+    - foreign: { from: [cover], images: [id] }
+  ratings:
+    columns:
+    - { name: account_id, type: ID, nullable: false }
+    - { name: media_id, type: ID, nullable: false }
+    - { name: rating, type: TINYINT, signed: false, nullable: false }
+    constraints:
+    - unique: [account_id, media_id]
+    - foreign: { from: [account_id], accounts: [id] }
+    - foreign: { from: [media_id], media: [id] }
+  movies:
+    columns:
+    - { name: id, type: ID, nullable: false }
+    - { name: minutes, type: SMALLINT, signed: false, nullable: false }
+    constraints:
+    - primary: [id]
+    - foreign: { from: [id], media: [id] }
+  people_in_media:
+    columns:
+    - { name: person_id, type: ID, nullable: false }
+    - { name: media_id, type: ID, nullable: false }
+    constraints:
+    - unique: [person_id, media_id]
+    - foreign: { from: [media_id], media: [id] }
+    - foreign: { from: [person_id], people: [id] }
+  reviews:
+    columns:
+    - { name: account_id, type: ID, nullable: false }
+    - { name: media_id, type: ID, nullable: false }
+    - { name: content, type: VARCHAR, size: 1023, nullable: false }
+    constraints:
+    - unique: [account_id, media_id]
+    - foreign: { from: [account_id], ratings: [account_id] }
+    - foreign: { from: [media_id], ratings: [media_id] }
