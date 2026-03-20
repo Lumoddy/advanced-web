@@ -64,6 +64,7 @@ export function phpAccessFromYaml(yaml: any): string
         }
 
         php += `} ...$rows
+         * @throws mysqli_sql_exception
          */
         function insert_`;
 
@@ -200,6 +201,7 @@ export function phpAccessFromYaml(yaml: any): string
         }
 
         php += `}[]
+         * @throws mysqli_sql_exception
          */
         function select_`;
 
@@ -208,7 +210,7 @@ export function phpAccessFromYaml(yaml: any): string
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT (`;
+                "SELECT `;
 
         firstColumn = true;
         for (const column of columns)
@@ -221,7 +223,7 @@ export function phpAccessFromYaml(yaml: any): string
             php += column["name"];
         }
 
-        php += `) FROM `;
+        php += ` FROM `;
         php += name;
         php += ` ".$rawCondition);
 
@@ -273,6 +275,287 @@ export function phpAccessFromYaml(yaml: any): string
             return $results;
         }
 `;
+
+        for (const constraint of constraints)
+        {
+            const constraintColumns = constraint["primary"] ?? constraint["unique"];
+            if (constraintColumns == null)
+                continue;
+
+            php += `
+        /**
+`;
+
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                php += `         * @param `;
+
+                if (column["nullable"])
+                    php += `?`;
+
+                switch (String.prototype.toUpperCase.call(column["type"]))
+                {
+                    case "TINYINT":
+                    case "SMALLINT":
+                    case "INT":
+                    case "BIGINT":
+                        php += `int`;
+                        break;
+                    case "VARCHAR":
+                    case "CHAR":
+                    case "VARBINARY":
+                    case "BINARY":
+                        php += `string`;
+                        break;
+                    default:
+                        php += `mixed`;
+                        break;
+                }
+
+                php += ` $`;
+                php += column["name"];
+                php += `
+`;
+            }
+
+            php += `         * @return ?array{`;
+
+            firstColumn = true;
+            for (const column of columns)
+            {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                php += column["name"];
+                php += `: `;
+
+                switch (String.prototype.toUpperCase.call(column["type"]))
+                {
+                    case "TINYINT":
+                    case "SMALLINT":
+                    case "INT":
+                    case "BIGINT":
+                        php += `int`;
+                        break;
+                    case "VARCHAR":
+                    case "CHAR":
+                    case "VARBINARY":
+                    case "BINARY":
+                        php += `string`;
+                        break;
+                    default:
+                        php += `mixed`;
+                        break;
+                }
+
+                if (column["nullable"])
+                    php += `|null`;
+            }
+
+            php += `}
+         * @throws mysqli_sql_exception
+         */
+        function get_`;
+
+            php += table["single"];
+            php += `_with`;
+
+            firstColumn = true;
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                php += `_`;
+
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `and_`;
+
+                php += column["name"];
+            }
+
+            php += `(`
+
+            firstColumn = true;
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                switch (String.prototype.toUpperCase.call(column["type"]))
+                {
+                    case "TINYINT":
+                    case "SMALLINT":
+                    case "INT":
+                    case "BIGINT":
+                        php += `int`;
+                        break;
+                    case "VARCHAR":
+                    case "CHAR":
+                    case "VARBINARY":
+                    case "BINARY":
+                        php += `string`;
+                        break;
+                    default:
+                        php += `mixed`;
+                        break;
+                }
+
+                if (column["nullable"])
+                    php += `|null`;
+
+                php += " $";
+                php += column["name"];
+            }
+
+            php += `): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `;
+
+            firstColumn = true;
+            for (const column of columns)
+            {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                php += column["name"];
+            }
+
+            php += ` FROM `;
+            php += name;
+            php += ` WHERE `;
+
+            firstColumn = true;
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += ` AND `;
+
+                php += column["name"];
+                php += " = ?";
+            }
+
+            php += `");
+
+            $stmt->bind_param(
+                "`;
+
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                switch (String.prototype.toUpperCase.call(column["type"]))
+                {
+                    case "TINYINT":
+                    case "SMALLINT":
+                    case "INT":
+                    case "BIGINT":
+                        php += `i`;
+                        break;
+                    default:
+                        php += `s`;
+                        break;
+                }
+            }
+
+            php += `",
+`;
+
+            firstColumn = true;
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `,
+`;
+
+                php += `                $`;
+                php += column["name"];
+            }
+
+            php += `);
+
+            $stmt->bind_result(
+`;
+
+            firstColumn = true;
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `,
+`;
+
+                php += `                $result_`;
+                php += column["name"];
+            }
+
+            php += `);
+
+            $stmt->execute();
+
+            if (!$stmt->fetch())
+                return null;
+
+            return
+            [
+`;
+
+            for (const constraintColumn of constraintColumns)
+            {
+                const column = Array.prototype.find.call(
+                    columns,
+                    ({ name }) => name === constraintColumn);
+
+                php += `                "`;
+                php += column["name"];
+                php += `" => $result_`;
+                php += column["name"];
+                php += `,
+`;
+            }
+
+            php += `            ];
+        }
+`;
+        }
     }
 
     php += `    }

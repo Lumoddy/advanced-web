@@ -3,7 +3,7 @@ export function sqlDatabaseFromYaml(yaml: any): string
 {
     const tables = yaml.tables;
 
-    let sql = `--- This file was auto-generated based on \`./database_structure.yaml\`
+    let sql = `--- This file was auto-generated based on ./database_structure.yaml
 
 START TRANSACTION;
 
@@ -14,10 +14,10 @@ START TRANSACTION;
         const table = tables[name];
         const columns = table.columns;
 
-        sql += `CREATE TABLE \``;
+        sql += `CREATE TABLE `;
         sql += name;
-        sql += `\` (
-    `;
+        sql += ` (
+`;
 
         let first = true;
         for (const column of columns)
@@ -26,11 +26,10 @@ START TRANSACTION;
                 first = false;
             else
                 sql += `,
-    `;
-
-            sql += `\``;
+`;
+            sql += `    `;
             sql += column["name"];
-            sql += `\` `;
+            sql += ` `;
             sql += column["type"];
 
             if (column["size"] != null)
@@ -46,8 +45,7 @@ START TRANSACTION;
             sql += column["nullable"] ? " NULL" : " NOT NULL";
         }
 
-        sql += `
-);
+        sql += `);
 
 `;
     }
@@ -57,10 +55,10 @@ START TRANSACTION;
         const table = tables[name];
         const constraints = table.constraints;
 
-        sql += `ALTER TABLE \``;
+        sql += `ALTER TABLE `;
         sql += name;
-        sql += `\`
-    `;
+        sql += `
+`;
 
         let first = true;
         for (const constraint of constraints)
@@ -71,9 +69,9 @@ START TRANSACTION;
                     first = false;
                 else
                     sql += `,
-    `;
+`;
 
-                sql += `ADD PRIMARY KEY (`;
+                sql += `    ADD PRIMARY KEY (`;
 
                 let firstColumn = true;
                 for (const column of constraint["primary"])
@@ -83,9 +81,7 @@ START TRANSACTION;
                     else
                         sql += `, `;
 
-                    sql += `\``;
                     sql += column;
-                    sql += `\``;
                 }
 
                 sql += `)`;
@@ -98,7 +94,7 @@ START TRANSACTION;
                     sql += `,
     `;
 
-                sql += `ADD UNIQUE KEY \``;
+                sql += `    ADD UNIQUE KEY `;
 
                 let firstColumn = true;
                 for (const column of constraint["unique"])
@@ -111,7 +107,7 @@ START TRANSACTION;
                     sql += column;
                 }
 
-                sql += `\` (`;
+                sql += ` (`;
 
                 firstColumn = true;
                 for (const column of constraint["unique"])
@@ -121,9 +117,7 @@ START TRANSACTION;
                     else
                         sql += `, `;
 
-                    sql += `\``;
                     sql += column;
-                    sql += `\``;
                 }
 
                 sql += `)`;
@@ -136,9 +130,9 @@ START TRANSACTION;
                     first = false;
                 else
                     sql += `,
-    `;
+`;
 
-                sql += `ADD KEY \``;
+                sql += `    ADD KEY `;
 
                 let firstColumn = true;
                 for (const column of foreign.from)
@@ -151,7 +145,7 @@ START TRANSACTION;
                     sql += column;
                 }
 
-                sql += `\` (`;
+                sql += ` (`;
 
                 firstColumn = true;
                 for (const column of foreign.from)
@@ -161,9 +155,7 @@ START TRANSACTION;
                     else
                         sql += `, `;
 
-                    sql += `\``;
                     sql += column;
-                    sql += `\``;
                 }
 
                 sql += `)`;
@@ -180,10 +172,10 @@ START TRANSACTION;
         const table = tables[name];
         const constraints = table.constraints;
 
-        sql += `ALTER TABLE \``;
+        sql += `ALTER TABLE `;
         sql += name;
-        sql += `\`
-    `;
+        sql += `
+`;
 
         let first = true;
         for (const constraint of constraints)
@@ -196,9 +188,9 @@ START TRANSACTION;
                     first = false;
                 else
                     sql += `,
-    `;
+`;
 
-                sql += `ADD CONSTRAINT \``;
+                sql += `    ADD CONSTRAINT `;
 
                 let firstColumn = true;
                 for (const column of foreign.from)
@@ -226,7 +218,7 @@ START TRANSACTION;
 
                 sql += `_in_`;
                 sql += foreign.toTable;
-                sql += `\` FOREIGN KEY (`;
+                sql += ` FOREIGN KEY (`;
 
                 firstColumn = true;
                 for (const column of foreign.from)
@@ -236,14 +228,12 @@ START TRANSACTION;
                     else
                         sql += `, `;
 
-                    sql += `\``;
                     sql += column;
-                    sql += `\``;
                 }
 
-                sql += `) REFERENCES \``;
+                sql += `) REFERENCES `;
                 sql += foreign.toTable;
-                sql += `\` (`;
+                sql += ` (`;
 
                 firstColumn = true;
                 for (const column of foreign.to)
@@ -253,9 +243,7 @@ START TRANSACTION;
                     else
                         sql += `, `;
 
-                    sql += `\``;
                     sql += column;
-                    sql += `\``;
                 }
 
                 sql += `)`;
@@ -269,7 +257,7 @@ START TRANSACTION;
 
     sql += `COMMIT;`;
 
-    sql = sql.replaceAll(/\n\nALTER TABLE `\w+`\n    ;/g, "");
+    sql = sql.replaceAll(/\n\nALTER TABLE \w+\n;/g, "");
 
     return sql;
 }
