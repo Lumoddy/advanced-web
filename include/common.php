@@ -22,7 +22,7 @@
 
         $new_path = pathinfo(
             substr($destination_dir, strlen($_SERVER["DOCUMENT_ROOT"])),
-            PATHINFO_ALL & ~PATHINFO_EXTENSION)
+            PATHINFO_DIRNAME)
             ."/"
             .pathinfo($fileName, PATHINFO_FILENAME)
             .".webp";

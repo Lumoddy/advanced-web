@@ -1,5 +1,5 @@
 <?php
-    /* This file was auto-generated based on `./database_structure.yaml` */
+    // This file was auto-generated based on ./build/database/database_structure.yaml.
 
     declare(strict_types=1);
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
@@ -11,6 +11,11 @@
         public function __construct(mysqli $connection)
         {
             $this->connection = $connection;
+        }
+
+        public function close()
+        {
+            $this->connection->close();
         }
 
         /**
@@ -26,7 +31,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO images (id, description) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+                "INSERT INTO `images` (`image_id`, `image_description`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
 
             $params = [];
 
@@ -37,8 +42,8 @@
             }
 
             $stmt->bind_param(str_repeat("is", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -51,7 +56,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, description FROM images ".$rawCondition);
+                "SELECT `image_id`, `image_description` FROM `images` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -69,10 +74,12 @@
                 array_push(
                     $results,
                     [
-                        "id" => $result_id,
-                        "description" => $result_description,
+                        "image_id" => $result_id,
+                        "image_description" => $result_description,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -86,24 +93,28 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, description FROM images WHERE id = ?");
+                "SELECT `image_id`, `image_description` FROM `images` WHERE `image_id` = ?");
 
             $stmt->bind_param(
                 "i",
                 $id);
 
             $stmt->bind_result(
-                $result_id);
+                $result_id,
+                $result_description);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "image_id" => $result_id,
+                    "image_description" => $result_description,
+                ]
+                : null;
 
-            return
-            [
-                "id" => $result_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -119,7 +130,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO accounts (id, username, email, password_hash) VALUES (?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?)", $count - 1));
+                "INSERT INTO `accounts` (`account_id`, `account_username`, `account_email`, `account_password_hash`) VALUES (?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -132,8 +143,8 @@
             }
 
             $stmt->bind_param(str_repeat("isss", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -146,7 +157,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, username, email, password_hash FROM accounts ".$rawCondition);
+                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -166,12 +177,14 @@
                 array_push(
                     $results,
                     [
-                        "id" => $result_id,
-                        "username" => $result_username,
-                        "email" => $result_email,
-                        "password_hash" => $result_password_hash,
+                        "account_id" => $result_id,
+                        "account_username" => $result_username,
+                        "account_email" => $result_email,
+                        "account_password_hash" => $result_password_hash,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -185,24 +198,32 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, username, email, password_hash FROM accounts WHERE id = ?");
+                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` WHERE `account_id` = ?");
 
             $stmt->bind_param(
                 "i",
                 $id);
 
             $stmt->bind_result(
-                $result_id);
+                $result_id,
+                $result_username,
+                $result_email,
+                $result_password_hash);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "account_id" => $result_id,
+                    "account_username" => $result_username,
+                    "account_email" => $result_email,
+                    "account_password_hash" => $result_password_hash,
+                ]
+                : null;
 
-            return
-            [
-                "id" => $result_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -214,28 +235,36 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, username, email, password_hash FROM accounts WHERE email = ?");
+                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` WHERE `account_email` = ?");
 
             $stmt->bind_param(
                 "s",
                 $email);
 
             $stmt->bind_result(
-                $result_email);
+                $result_id,
+                $result_username,
+                $result_email,
+                $result_password_hash);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "account_id" => $result_id,
+                    "account_username" => $result_username,
+                    "account_email" => $result_email,
+                    "account_password_hash" => $result_password_hash,
+                ]
+                : null;
 
-            return
-            [
-                "email" => $result_email,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
-         * @param array{id: int, title: string, description: string, cover: int} ...$rows
+         * @param array{id: int, title: string, description: string, cover_image_id: int} ...$rows
          * @throws mysqli_sql_exception
          */
         function insert_media(array ...$rows): void
@@ -247,7 +276,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO media (id, title, description, cover) VALUES (?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?)", $count - 1));
+                "INSERT INTO `media` (`media_id`, `media_title`, `media_description`, `media_cover_image_id`) VALUES (?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -256,25 +285,25 @@
                 array_push($params, $row["id"]);
                 array_push($params, $row["title"]);
                 array_push($params, $row["description"]);
-                array_push($params, $row["cover"]);
+                array_push($params, $row["cover_image_id"]);
             }
 
             $stmt->bind_param(str_repeat("issi", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
          * @param string $rawCondition
          * @param mixed ...$bind_params
-         * @return array{id: int, title: string, description: string, cover: int}[]
+         * @return array{id: int, title: string, description: string, cover_image_id: int}[]
          * @throws mysqli_sql_exception
          */
         function select_media(string $rawCondition, ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, title, description, cover FROM media ".$rawCondition);
+                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id` FROM `media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -283,7 +312,7 @@
                 $result_id,
                 $result_title,
                 $result_description,
-                $result_cover);
+                $result_cover_image_id);
 
             $stmt->execute();
 
@@ -294,43 +323,53 @@
                 array_push(
                     $results,
                     [
-                        "id" => $result_id,
-                        "title" => $result_title,
-                        "description" => $result_description,
-                        "cover" => $result_cover,
+                        "media_id" => $result_id,
+                        "media_title" => $result_title,
+                        "media_description" => $result_description,
+                        "media_cover_image_id" => $result_cover_image_id,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
 
         /**
          * @param int $id
-         * @return ?array{id: int, title: string, description: string, cover: int}
+         * @return ?array{id: int, title: string, description: string, cover_image_id: int}
          * @throws mysqli_sql_exception
          */
         function get_media_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, title, description, cover FROM media WHERE id = ?");
+                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id` FROM `media` WHERE `media_id` = ?");
 
             $stmt->bind_param(
                 "i",
                 $id);
 
             $stmt->bind_result(
-                $result_id);
+                $result_id,
+                $result_title,
+                $result_description,
+                $result_cover_image_id);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "media_id" => $result_id,
+                    "media_title" => $result_title,
+                    "media_description" => $result_description,
+                    "media_cover_image_id" => $result_cover_image_id,
+                ]
+                : null;
 
-            return
-            [
-                "id" => $result_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -346,7 +385,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO people (id, full_name, description) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
+                "INSERT INTO `people` (`person_id`, `person_full_name`, `person_description`) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -358,8 +397,8 @@
             }
 
             $stmt->bind_param(str_repeat("iss", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -372,7 +411,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, full_name, description FROM people ".$rawCondition);
+                "SELECT `person_id`, `person_full_name`, `person_description` FROM `people` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -391,11 +430,13 @@
                 array_push(
                     $results,
                     [
-                        "id" => $result_id,
-                        "full_name" => $result_full_name,
-                        "description" => $result_description,
+                        "person_id" => $result_id,
+                        "person_full_name" => $result_full_name,
+                        "person_description" => $result_description,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -409,24 +450,30 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, full_name, description FROM people WHERE id = ?");
+                "SELECT `person_id`, `person_full_name`, `person_description` FROM `people` WHERE `person_id` = ?");
 
             $stmt->bind_param(
                 "i",
                 $id);
 
             $stmt->bind_result(
-                $result_id);
+                $result_id,
+                $result_full_name,
+                $result_description);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "person_id" => $result_id,
+                    "person_full_name" => $result_full_name,
+                    "person_description" => $result_description,
+                ]
+                : null;
 
-            return
-            [
-                "id" => $result_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -442,7 +489,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO ratings (account_id, media_id, rating) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
+                "INSERT INTO `ratings` (`account_id`, `media_id`, `rating_rating`) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -454,8 +501,8 @@
             }
 
             $stmt->bind_param(str_repeat("iii", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -468,7 +515,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT account_id, media_id, rating FROM ratings ".$rawCondition);
+                "SELECT `account_id`, `media_id`, `rating_rating` FROM `ratings` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -489,9 +536,11 @@
                     [
                         "account_id" => $result_account_id,
                         "media_id" => $result_media_id,
-                        "rating" => $result_rating,
+                        "rating_rating" => $result_rating,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -506,7 +555,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT account_id, media_id, rating FROM ratings WHERE account_id = ? AND media_id = ?");
+                "SELECT `account_id`, `media_id`, `rating_rating` FROM `ratings` WHERE `account_id` = ? AND `media_id` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -515,18 +564,22 @@
 
             $stmt->bind_result(
                 $result_account_id,
-                $result_media_id);
+                $result_media_id,
+                $result_rating);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "account_id" => $result_account_id,
+                    "media_id" => $result_media_id,
+                    "rating_rating" => $result_rating,
+                ]
+                : null;
 
-            return
-            [
-                "account_id" => $result_account_id,
-                "media_id" => $result_media_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -542,7 +595,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO movies (id, minutes) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+                "INSERT INTO `movies` (`media_id`, `movie_length_minutes`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
 
             $params = [];
 
@@ -553,8 +606,8 @@
             }
 
             $stmt->bind_param(str_repeat("ii", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -567,7 +620,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, minutes FROM movies ".$rawCondition);
+                "SELECT `media_id`, `movie_length_minutes` FROM `movies` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -585,10 +638,12 @@
                 array_push(
                     $results,
                     [
-                        "id" => $result_id,
-                        "minutes" => $result_minutes,
+                        "media_id" => $result_id,
+                        "movie_length_minutes" => $result_minutes,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -602,24 +657,28 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT id, minutes FROM movies WHERE id = ?");
+                "SELECT `media_id`, `movie_length_minutes` FROM `movies` WHERE `media_id` = ?");
 
             $stmt->bind_param(
                 "i",
                 $id);
 
             $stmt->bind_result(
-                $result_id);
+                $result_id,
+                $result_minutes);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "media_id" => $result_id,
+                    "movie_length_minutes" => $result_minutes,
+                ]
+                : null;
 
-            return
-            [
-                "id" => $result_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -635,7 +694,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO people_in_media (person_id, media_id) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+                "INSERT INTO `people_in_media` (`person_id`, `media_id`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
 
             $params = [];
 
@@ -646,8 +705,8 @@
             }
 
             $stmt->bind_param(str_repeat("ii", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -660,7 +719,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT person_id, media_id FROM people_in_media ".$rawCondition);
+                "SELECT `person_id`, `media_id` FROM `people_in_media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -683,6 +742,8 @@
                     ]);
             }
 
+            $stmt->close();
+
             return $results;
         }
 
@@ -696,7 +757,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT person_id, media_id FROM people_in_media WHERE person_id = ? AND media_id = ?");
+                "SELECT `person_id`, `media_id` FROM `people_in_media` WHERE `person_id` = ? AND `media_id` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -709,14 +770,16 @@
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "person_id" => $result_person_id,
+                    "media_id" => $result_media_id,
+                ]
+                : null;
 
-            return
-            [
-                "person_id" => $result_person_id,
-                "media_id" => $result_media_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
 
         /**
@@ -732,7 +795,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO reviews (account_id, media_id, content) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
+                "INSERT INTO `reviews` (`account_id`, `media_id`, `review_content`) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -744,8 +807,8 @@
             }
 
             $stmt->bind_param(str_repeat("iis", $count), ...$params);
-
             $stmt->execute();
+            $stmt->close();
         }
 
         /**
@@ -758,7 +821,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT account_id, media_id, content FROM reviews ".$rawCondition);
+                "SELECT `account_id`, `media_id`, `review_content` FROM `reviews` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -779,9 +842,11 @@
                     [
                         "account_id" => $result_account_id,
                         "media_id" => $result_media_id,
-                        "content" => $result_content,
+                        "review_content" => $result_content,
                     ]);
             }
+
+            $stmt->close();
 
             return $results;
         }
@@ -796,7 +861,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT account_id, media_id, content FROM reviews WHERE account_id = ? AND media_id = ?");
+                "SELECT `account_id`, `media_id`, `review_content` FROM `reviews` WHERE `account_id` = ? AND `media_id` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -805,18 +870,22 @@
 
             $stmt->bind_result(
                 $result_account_id,
-                $result_media_id);
+                $result_media_id,
+                $result_content);
 
             $stmt->execute();
 
-            if (!$stmt->fetch())
-                return null;
+            $result = $stmt->fetch()
+                ? [
+                    "account_id" => $result_account_id,
+                    "media_id" => $result_media_id,
+                    "review_content" => $result_content,
+                ]
+                : null;
 
-            return
-            [
-                "account_id" => $result_account_id,
-                "media_id" => $result_media_id,
-            ];
+            $stmt->close();
+
+            return $result;
         }
     }
 ?>

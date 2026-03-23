@@ -1,0 +1,129 @@
+
+replacements:
+
+  column:
+  - - { type: ID }
+    - { type: INT, signed: false }
+  - - { type: ENUM }
+    - { type: TINYINT, signed: false }
+  - - { type: NAME }
+    - { type: VARCHAR, size: (2**8)-1 }
+  - - { type: HASH }
+    - { type: VARCHAR, size: (2**8)-1 }
+  - - { type: TITLE }
+    - { type: VARCHAR, size: (2**10)-1 }
+  - - { type: DESCRIPTION }
+    - { type: VARCHAR, size: (2**16)-1 }
+
+tables:
+
+  images:
+    columns:
+      image_id: { PHP Short Single: id, type: ID }
+      image_description: { PHP Short Single: description, type: DESCRIPTION }
+    constraints:
+    - primary:
+      - image_id
+
+  accounts:
+    columns:
+      account_id: { PHP Short Single: id, type: ID }
+      account_username: { PHP Short Single: username, type: VARCHAR, size: 31 }
+      account_email: { PHP Short Single: email, type: VARCHAR, size: 320 }
+      account_password_hash: { PHP Short Single: password_hash, type: HASH }
+    constraints:
+    - primary:
+      - account_id
+    - unique:
+      - account_email
+
+  media:
+    PHP Single: media
+    columns:
+      media_id: { PHP Short Single: id, type: ID }
+      media_title: { PHP Short Single: title, type: TITLE }
+      media_description: { PHP Short Single: description, type: DESCRIPTION }
+      media_cover_image_id: { PHP Short Single: cover_image_id, type: ID }
+    constraints:
+    - primary:
+      - media_id
+    - foreign:
+      - - media_cover_image_id
+      - images:
+        - image_id
+
+  people:
+    PHP Single: person
+    columns:
+      person_id: { PHP Short Single: id, type: ID }
+      person_full_name: { PHP Short Single: full_name, type: NAME }
+      person_description: { PHP Short Single: description, type: DESCRIPTION }
+    constraints:
+    - primary:
+      - person_id
+
+  ratings:
+    columns:
+      account_id: { PHP Short Single: account_id, type: ID }
+      media_id: { PHP Short Single: media_id, type: ID }
+      rating_rating: { PHP Short Single: rating, type: TINYINT, signed: false }
+    constraints:
+    - unique:
+      - account_id
+      - media_id
+    - foreign:
+      - - account_id
+      - accounts:
+        - account_id
+    - foreign:
+      - - media_id
+      - media:
+        - media_id
+
+  movies:
+    columns:
+      media_id: { PHP Short Single: id, type: ID }
+      movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
+    constraints:
+    - primary:
+      - media_id
+    - foreign:
+      - - media_id
+      - media:
+        - media_id
+
+  people_in_media:
+    PHP Single: person_in_media
+    columns:
+      person_id: { PHP Short Single: person_id, type: ID }
+      media_id: { PHP Short Single: media_id, type: ID }
+    constraints:
+    - unique:
+      - person_id
+      - media_id
+    - foreign:
+      - - media_id
+      - media:
+        - media_id
+    - foreign:
+      - - person_id
+      - people:
+        - person_id
+
+  reviews:
+    columns:
+      account_id: { PHP Short Single: account_id, type: ID }
+      media_id: { PHP Short Single: media_id, type: ID }
+      review_content: { PHP Short Single: content, type: DESCRIPTION }
+    constraints:
+    - unique:
+      - account_id
+      - media_id
+    - foreign:
+      - - account_id
+      - ratings:
+        - account_id
+    - foreign:
+      - - media_id
+      - ratings:
+        - media_id

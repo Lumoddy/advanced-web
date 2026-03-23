@@ -8,8 +8,10 @@
     /**
      * Scraped from https://dev.mysql.com/doc/mysql-errors/9.6/en/server-error-reference.html.
      */
-    namespace mysqli_error_code
+    class mysqli_error_code
     {
+        private function __construct() { }
+
         /**
          * Error number: 1002; Symbol: ER_NO; SQLSTATE: HY000
          *

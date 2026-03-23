@@ -2,93 +2,151 @@ import * as fs from "node:fs/promises";
 import { exec } from "node:child_process";
 import { log } from "./logging.ts";
 import * as YAML from "yaml";
-import { sqlDatabaseFromYaml } from "./database_sql.ts";
-import { phpAccessFromYaml } from "./database_access.ts";
+import { sqlFileFrom } from "./database/database_sql.ts";
+import { preprocessObject } from "./database/preprocess.ts";
+import { phpFileFrom } from "./database/database_access.ts";
 
-log("success", "Initialized.");
+// Run this command:
+// node ./build/build.ts
 
-(async () =>
-{
-    await new Promise<void>((resolve, reject) => exec("npx tsc", {}, (error) =>
+log("success", "Build started.");
+
+Promise.all(
+[
+    (async () =>
     {
-        if (error !== null)
+        let file;
+        try { file = YAML.parse(await fs.readFile("./build/database/database_structure.yaml", "utf-8")) }
+        catch (e)
         {
-            log("error", error.message);
-            reject(error);
-        }
-        else
-        {
-            log("success", "Transpiled typeScript.");
-            resolve();
-        }
-    }));
-})();
-
-(async () =>
-{
-    let file;
-    try { file = YAML.parse(await fs.readFile("./sql/database_structure.yaml", "utf-8")) }
-    catch (e)
-    {
-        log("error", e instanceof Error ? e.message : e);
-        return;
-    }
-
-    const replacements = file.replacements;
-    const tables = file.tables;
-
-    for (const name in tables)
-    {
-        const table = tables[name];
-
-        const columns = table.columns;
-        for (let i = 0; i < columns.length; i += 1)
-        {
-            toNext: for (const [from, to] of replacements)
-            {
-                const column = columns[i];
-
-                for (const key in from)
-                {
-                    if (column[key] !== from[key])
-                        continue toNext;
-                }
-
-                columns[i] = { ...column, ...to };
-            }
+            log("error", e instanceof Error ? e.stack : e);
+            return;
         }
 
-        const constraints = table.constraints;
-        for (const constraint of constraints)
-        {
-            if ("foreign" in constraint)
-            {
-                let from, to, toTable;
-                const foreign = constraint["foreign"];
-                for (const part in foreign)
-                {
-                    if (part === "from")
-                        from = foreign["from"];
-                    else
-                        to = foreign[toTable = part];
-                }
+        const databaseStructure = preprocessObject(file);
 
-                constraint["foreign"] = { from, to, toTable };
-            }
-        }
-    }
-
-    try
-    {
         await Promise.all(
         [
-            fs.writeFile("./sql/database_structure.sql", sqlDatabaseFromYaml(file), "utf-8"),
-            fs.writeFile("./i/auto_database.php", phpAccessFromYaml(file), "utf-8"),
+            fs.writeFile(
+                "./sql/database_structure.sql",
+                `
+--- This file was auto-generated based on ./build/database/database_structure.yaml.
+${sqlFileFrom(databaseStructure)}`,
+                "utf-8")
+                .then(() => log("success", "Converted database structure to SQL file.")),
+
+            fs.writeFile(
+                "./include/auto_database.php",
+                `<?php
+    // This file was auto-generated based on ./build/database/database_structure.yaml.
+${phpFileFrom(databaseStructure)}?>`,
+                "utf-8")
+                .then(() => log("success", "Converted database structure to PHP access.")),
         ]);
-    }
-    catch (e)
+    })(),
+    (async () =>
     {
-        log("error", e instanceof Error ? e.message : e);
-        return;
-    }
-})();
+        const declaredErrors = new Map<string, Set<string> | null>();
+
+        await Promise.all(
+            (await fs.readdir(
+                "./json",
+                { withFileTypes: true, recursive: true }))
+            .map(async (dirent) =>
+            {
+                if (!dirent.isFile())
+                    return;
+
+                const path = `${dirent.parentPath}/${dirent.name}`;
+                let errors: Set<string> | null = new Set();
+
+                const [, extension] = /^.*?(?:\.([^\.]*))?$/s
+                    .exec(dirent.name) as [string, string?];
+
+                switch (extension?.toLowerCase())
+                {
+                    case "php":
+                    {
+                        const file = await fs.readFile(path, "utf-8");
+
+                        const pattern = /\?>"error":"(?<m>(?:[^"\\]|\\.)*)",?<\?php|json_encode\s*\(\s*\[\s*"error" => "(?<m>(?:[^"\\]|\\.)*)|\?>"error":"?<\?php(?<a>)|json_encode(?<a>)"/gs;
+
+                        let match;
+                        while ((match = pattern.exec(file)) !== null)
+                        {
+                            if ((match.groups as any)["a"] === undefined)
+                                errors.add((match.groups as any)["m"]);
+                            else
+                            {
+                                errors = null;
+                                break;
+                            }
+                        }
+
+                        declaredErrors.set(path, errors);
+
+                        break;
+                    }
+                }
+            }));
+
+        let auto = `
+// This file was auto-generated based on the errors detected under ./json.
+
+export type ServerErrorMap =
+{
+`;
+        for (const [path, errors] of declaredErrors)
+        {
+            auto += `    [\``;
+            auto += path;
+            auto += `\`]: `;
+
+            if (errors === null)
+                auto += `string`;
+            else
+            {
+                let first = true;
+                for (const error of errors)
+                {
+                    if (first)
+                        first = false;
+                    else
+                        auto += ` | `;
+
+                    auto += `\``;
+                    auto += error;
+                    auto += `\``;
+                }
+            }
+
+            auto += `,
+`;
+        }
+
+        auto += `};
+
+export type ServerError = ServerErrorMap[keyof ServerErrorMap];
+`;
+
+        await fs.writeFile("./ts/server_errors.d.ts", auto, "utf-8");
+
+        log("success", "Converted errors from api files into TypeScript declaration.");
+
+        await new Promise<void>((resolve, reject) => exec("npx tsc", {}, (error) =>
+        {
+            if (error !== null)
+            {
+                reject(error);
+            }
+            else
+            {
+                log("success", "Transpiled TypeScript.");
+                resolve();
+            }
+        }));
+    })(),
+])
+    .then(
+        () => log("success", "Build completed."),
+        (e) => log("error", e instanceof Error ? e.stack : e));

@@ -3,7 +3,7 @@
  * `manual-shine`.
  */
 export function manualShine(element, duration = 500) {
-    return element.animate([{ "--shine": 0 }, { "--shine": 1 }], {
+    return Element.prototype.animate.call(element, [{ "--shine": 0 }, { "--shine": 1 }], {
         duration,
         iterations: 1,
     });

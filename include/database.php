@@ -28,36 +28,58 @@
          * @throws mysqli_sql_exception
          */
         public function get_account_with_login(
-            string $email,
+            string $identifier,
             #[SensitiveParameter] string $password): ?array
         {
-            $account = $this->get_account_with_email($email);
-            if ($account === null
-                || !password_verify($password, $account["password_hash"]))
-                return null;
+            foreach (
+                $this->select_accounts(
+                    "WHERE account_email = @identifier OR account_username = @identifier",
+                    "s",
+                    $identifier) as $account)
+            {
+                if (password_verify($password, $account["password_hash"]))
+                    return $account;
+            }
 
-            return $account;
+            return null;
         }
 
         /**
          * @param string $email
          * @param string $password
          * @param string $username
-         * @return ?array{id: int, username: string, email: string, password_hash: string}
+         * @return array{id: int, username: string, email: string, password_hash: string}
          * @throws mysqli_sql_exception
          */
         public function insert_account_with_login(
             string $email,
             #[SensitiveParameter] string $password,
-            string $username): ?array
+            string $username): array
         {
-            return $this->insert_accounts(
+            $entry =
             [
                 "id" => $this->unique_id_in("accounts"),
                 "username" => $username,
                 "email" => $email,
                 "password" => password_hash($password, PASSWORD_DEFAULT),
-            ]);
+            ];
+
+            return $entry;
+        }
+
+        /**
+         * @param string $current
+         * @param int $limit
+         * @return array{id: int, title: string, description: string, cover_image_id: int}[]
+         */
+        public function select_search_completion(string $current, int $limit): array
+        {
+            return $this->select_media(
+                "WHERE `media_title` LIKE CONCAT(\"%\", ?, \"%\") ORDER BY LOCATE(?, `media_title`) DESC LIMIT ?",
+                "ssi",
+                $current,
+                $current,
+                $limit);
         }
 
         /**
@@ -79,6 +101,8 @@
                 $stmt->execute();
             }
             while ($stmt->fetch());
+
+            $stmt->close();
 
             return $id;
         }
