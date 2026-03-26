@@ -412,7 +412,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
                     for (const [columnName, column] of table.columns)
                     {
                         php += `                    "`;
-                        php += columnName;
+                        php += column.snakeShortenedSingle;
                         php += `" => $result_`;
                         php += column.snakeShortenedSingle;
                         php += `,

@@ -45,10 +45,10 @@
         {
             $entry =
             [
-                "id" => $this->unique_id_in("accounts"),
+                "id" => $this->unique_id_in("accounts", "account_id"),
                 "username" => $account["username"],
                 "email" => $account["email"],
-                "password" => $account["password"],
+                "password_hash" => $account["password_hash"],
             ];
 
             $this->insert_accounts($entry);
@@ -58,14 +58,15 @@
 
         /**
          * @param string $source
+         * @param string $column
          * @return int
          * @throws mysqli_sql_exception
          */
-        private function unique_id_in(string $source): int
+        private function unique_id_in(string $source, string $column = "id"): int
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT 0 FROM $source WHERE id = ? LIMIT 1");
+                "SELECT 0 FROM `$source` WHERE `$column` = ? LIMIT 1");
 
             $stmt->bind_param("i", $id);
 

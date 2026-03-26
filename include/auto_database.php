@@ -107,8 +107,8 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "image_id" => $result_id,
-                    "image_description" => $result_description,
+                    "id" => $result_id,
+                    "description" => $result_description,
                 ]
                 : null;
 
@@ -214,10 +214,10 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "account_id" => $result_id,
-                    "account_username" => $result_username,
-                    "account_email" => $result_email,
-                    "account_password_hash" => $result_password_hash,
+                    "id" => $result_id,
+                    "username" => $result_username,
+                    "email" => $result_email,
+                    "password_hash" => $result_password_hash,
                 ]
                 : null;
 
@@ -251,10 +251,10 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "account_id" => $result_id,
-                    "account_username" => $result_username,
-                    "account_email" => $result_email,
-                    "account_password_hash" => $result_password_hash,
+                    "id" => $result_id,
+                    "username" => $result_username,
+                    "email" => $result_email,
+                    "password_hash" => $result_password_hash,
                 ]
                 : null;
 
@@ -360,10 +360,10 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "media_id" => $result_id,
-                    "media_title" => $result_title,
-                    "media_description" => $result_description,
-                    "media_cover_image_id" => $result_cover_image_id,
+                    "id" => $result_id,
+                    "title" => $result_title,
+                    "description" => $result_description,
+                    "cover_image_id" => $result_cover_image_id,
                 ]
                 : null;
 
@@ -465,9 +465,9 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "person_id" => $result_id,
-                    "person_full_name" => $result_full_name,
-                    "person_description" => $result_description,
+                    "id" => $result_id,
+                    "full_name" => $result_full_name,
+                    "description" => $result_description,
                 ]
                 : null;
 
@@ -573,7 +573,7 @@
                 ? [
                     "account_id" => $result_account_id,
                     "media_id" => $result_media_id,
-                    "rating_rating" => $result_rating,
+                    "rating" => $result_rating,
                 ]
                 : null;
 
@@ -671,8 +671,8 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "media_id" => $result_id,
-                    "movie_length_minutes" => $result_minutes,
+                    "id" => $result_id,
+                    "minutes" => $result_minutes,
                 ]
                 : null;
 
@@ -879,7 +879,7 @@
                 ? [
                     "account_id" => $result_account_id,
                     "media_id" => $result_media_id,
-                    "review_content" => $result_content,
+                    "content" => $result_content,
                 ]
                 : null;
 

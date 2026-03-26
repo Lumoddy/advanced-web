@@ -9,14 +9,19 @@
 
     $new = request_param_bool("new") ?? false;
 
+    $posted_email = posted_param("email");
+    $posted_password = posted_param("password");
+    $posted_username = posted_param("username");
+    $posted_identifier = posted_param("identifier")
+        ?? $posted_email
+        ?? $posted_username;
+
     if ($new
-        ? posted_param_isset("email")
-            || posted_param_isset("password")
-            || posted_param_isset("username")
-        : posted_param_isset("identifier")
-            || posted_param_isset("email")
-            || posted_param_isset("username")
-            || posted_param_isset("password"))
+        ? !is_null($posted_email)
+            || !is_null($posted_password)
+            || !is_null($posted_username)
+        : !is_null($posted_identifier)
+            || !is_null($posted_password))
     {
         try
         {
@@ -61,7 +66,34 @@
             type="email"
             class="glass"
             autocomplete="email"
-            tabindex="<?php echo $new ? "0" : "-1" ?>">
+            tabindex="<?php echo $new ? "0" : "-1" ?>"
+            <?php
+                if (!is_null($posted_email))
+                {
+                    ?>value="<?php
+                    echo $posted_email
+                    ?>"<?php
+                }
+            ?>>
+        </p>
+        <p>
+          <label>Username</label>
+          <br>
+          <input
+            id="create-account-username"
+            name="username"
+            type="text"
+            class="glass"
+            autocomplete="username"
+            tabindex="<?php echo $new ? "0" : "-1" ?>"
+            <?php
+                if (!is_null($posted_username))
+                {
+                    ?>value="<?php
+                    echo $posted_username
+                    ?>"<?php
+                }
+            ?>>
         </p>
         <p>
           <label>Password</label>
@@ -112,15 +144,23 @@
         method="post">
         <h1>Login</h1>
         <p>
-          <label>Email</label>
+          <label>Email or Username</label>
           <br>
           <input
-            id="login-email"
-            name="email"
+            id="login-identifier"
+            name="identifier"
             type="email"
             class="glass"
             autocomplete="email"
-            tabindex="<?php echo $new ? "-1" : "0" ?>">
+            tabindex="<?php echo $new ? "-1" : "0" ?>"
+            <?php
+                if (!is_null($posted_identifier))
+                {
+                    ?>value="<?php
+                    echo $posted_identifier
+                    ?>"<?php
+                }
+            ?>>
         </p>
         <p>
           <label>Password</label>

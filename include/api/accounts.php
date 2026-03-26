@@ -5,7 +5,7 @@
 
     /**
      * Public API
-     * @return array{id: int, username: string, email: string}
+     * @return array{is_logged_in: true, id: int, username: string, email: string}
      * @throws api_error
      */
     function api_login(): array
@@ -59,9 +59,9 @@
             {
                 $account = $connection->insert_account_with_unique_id(
                 [
-                    "username" => $posted_password,
+                    "username" => $posted_username,
                     "email" => $posted_email,
-                    "password_hash" => $posted_username
+                    "password_hash" => password_hash($posted_password, PASSWORD_DEFAULT),
                 ]);
             }
             catch (mysqli_sql_exception $e)
@@ -77,12 +77,13 @@
                 }
             }
 
-            $_SESSION["account-id"] = $account["id"];
-            $_SESSION["account-username"] = $account["username"];
-            $_SESSION["account-email"] = $account["email"];
+            $_SESSION["account_id"] = $account["id"];
+            $_SESSION["account_username"] = $account["username"];
+            $_SESSION["account_email"] = $account["email"];
 
             return
             [
+                "is_logged_in" => true,
                 "id" => $account["id"],
                 "username" => $account["username"],
                 "email" => $account["email"],
@@ -134,12 +135,13 @@
                     "login/not-found",
                     "No account was found with that email or password.");
 
-            $_SESSION["account-id"] = $matching_account["id"];
-            $_SESSION["account-username"] = $matching_account["username"];
-            $_SESSION["account-email"] = $matching_account["email"];
+            $_SESSION["account_id"] = $matching_account["id"];
+            $_SESSION["account_username"] = $matching_account["username"];
+            $_SESSION["account_email"] = $matching_account["email"];
 
             return
             [
+                "is_logged_in" => true,
                 "id" => $matching_account["id"],
                 "username" => $matching_account["username"],
                 "email" => $matching_account["email"],
@@ -149,17 +151,43 @@
 
     /**
      * Public API
-     * @return array{}
+     * @return array{is_logged_in: true, id: int, username: string, email: string}|array{is_logged_in: false, id: null, username: null, email: null}
+     * @throws api_error
+     */
+    function api_account_info(): array
+    {
+        session_start();
+
+        return isset($_SESSION["account_id"])
+            ? [
+                "is_logged_in" => true,
+                "id" => (int)$_SESSION["account_id"],
+                "username" => (string)$_SESSION["account_username"],
+                "email" => (string)$_SESSION["account_email"],
+            ]
+            : [
+                "is_logged_in" => false,
+                "id" => null,
+                "username" => null,
+                "email" => null,
+            ];
+    }
+
+    /**
+     * Public API
+     * @return array{is_logged_in: false, was_logged_in: bool}
      * @throws api_error
      */
     function api_logout(): array
     {
         session_start();
 
-        unset($_SESSION["account-id"]);
-        unset($_SESSION["account-email"]);
-        unset($_SESSION["account-username"]);
+        $was_logged_in = isset($_SESSION["account_id"]);
 
-        return [];
+        unset($_SESSION["account_id"]);
+        unset($_SESSION["account_email"]);
+        unset($_SESSION["account_username"]);
+
+        return [ "is_logged_in" => false, "was_logged_in" => $was_logged_in ];
     }
 ?>

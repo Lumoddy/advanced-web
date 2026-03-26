@@ -251,7 +251,7 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
 
                     if (fields.size === 0)
                     {
-                        current = "{}";
+                        current = "[]";
                     }
                     else
                     {
@@ -272,6 +272,12 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
 
                         current += " }";
                     }
+
+                    next = iterator.next();
+                    if (next.done)
+                        return finalize(result.add(current));
+
+                    ({type, value} = next.value);
                 }
                 else if (type === "<")
                 {
@@ -316,6 +322,12 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
                     current += ", ";
                     current += fieldType;
                     current += ">";
+
+                    next = iterator.next();
+                    if (next.done)
+                        return finalize(result.add(current));
+
+                    ({type, value} = next.value);
                 }
             }
             else
@@ -323,8 +335,6 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
         }
         else
             return null;
-
-        let arrayDepth = 0;
 
         if (type === "[")
         {
@@ -339,7 +349,7 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
                 if (type !== "]")
                     return null;
 
-                arrayDepth += 1;
+                current += "[]";
 
                 next = iterator.next();
                 if (next.done)
@@ -352,10 +362,10 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
             }
         }
 
-        if (type !== "|")
-            return finalize(result.add(current));
-
         result.add(current);
+
+        if (type !== "|")
+            return finalize(result);
 
         next = iterator.next();
         if (next.done)
