@@ -5,7 +5,7 @@
     /**
      * @param string $fileName The path to the original image file
      * @param int $size The maximum width or height of the thumbnail, in pixels
-     * @param ?string $destination_dir The directory to save the thumbnail in,
+     * @param ? $destination_dir The directory to save the thumbnail in,
      * or null to save in the default cache directory. Must be an absolute path
      * starting with the document root
      * @return string The path to the thumbnail, relative to the document root
@@ -15,7 +15,7 @@
         int $size,
         ?string $destination_dir = null): string
     {
-        if ($destination_dir === null)
+        if (is_null($destination_dir))
             $destination_dir = $_SERVER["DOCUMENT_ROOT"]."/img/cache";
         else if (!str_starts_with($destination_dir, $_SERVER["DOCUMENT_ROOT"]))
             throw new LogicException("'\$fileName' must be an absolute path.");

@@ -1,6 +1,7 @@
 <?php
     declare(strict_types=1);
-    require_once("./i/mysqli_errors.php");
+    require_once $_SERVER['DOCUMENT_ROOT']."/include/mysqli_errors.php";
+    require_once $_SERVER['DOCUMENT_ROOT']."/include/auto_database.php";
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     /**
@@ -16,7 +17,7 @@
         /**
          * @throws mysqli_sql_exception
          */
-        public function __construct(?mysqli $connection = null)
+        public function __construct(?float $connection = null)
         {
             parent::__construct($connection ?? default_connection());
         }
@@ -24,62 +25,35 @@
         /**
          * @param string $email
          * @param string $password
-         * @return ?array{id: int, username: string, email: string, password_hash: string}
+         * @return array{id: int, username: string, email: string, password_hash: string}[]
          * @throws mysqli_sql_exception
          */
-        public function get_account_with_login(
-            string $identifier,
-            #[SensitiveParameter] string $password): ?array
+        public function get_accounts_with_username(string $username): array
         {
-            foreach (
-                $this->select_accounts(
-                    "WHERE account_email = @identifier OR account_username = @identifier",
-                    "s",
-                    $identifier) as $account)
-            {
-                if (password_verify($password, $account["password_hash"]))
-                    return $account;
-            }
-
-            return null;
+            return $this->select_accounts(
+                "WHERE account_username = ?",
+                "s",
+                $username);
         }
 
         /**
-         * @param string $email
-         * @param string $password
-         * @param string $username
+         * @param array{username: string, email: string, password_hash: string} $account
          * @return array{id: int, username: string, email: string, password_hash: string}
          * @throws mysqli_sql_exception
          */
-        public function insert_account_with_login(
-            string $email,
-            #[SensitiveParameter] string $password,
-            string $username): array
+        public function insert_account_with_unique_id(array $account): array
         {
             $entry =
             [
                 "id" => $this->unique_id_in("accounts"),
-                "username" => $username,
-                "email" => $email,
-                "password" => password_hash($password, PASSWORD_DEFAULT),
+                "username" => $account["username"],
+                "email" => $account["email"],
+                "password" => $account["password"],
             ];
 
-            return $entry;
-        }
+            $this->insert_accounts($entry);
 
-        /**
-         * @param string $current
-         * @param int $limit
-         * @return array{id: int, title: string, description: string, cover_image_id: int}[]
-         */
-        public function select_search_completion(string $current, int $limit): array
-        {
-            return $this->select_media(
-                "WHERE `media_title` LIKE CONCAT(\"%\", ?, \"%\") ORDER BY LOCATE(?, `media_title`) DESC LIMIT ?",
-                "ssi",
-                $current,
-                $current,
-                $limit);
+            return $entry;
         }
 
         /**

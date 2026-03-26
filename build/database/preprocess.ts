@@ -14,6 +14,7 @@ export type DatabaseColumn =
         | { type: "SMALLINT", size: undefined }
         | { type: "TINYINT", size: undefined }
         | { type: "TIMESTAMP", size: undefined }
+        | { type: "TEXT", size: undefined }
         | { type: "VARCHAR", size: number }
         | { type: "CHAR", size: number }
         | { type: "VARBINARY", size: number }
@@ -33,6 +34,7 @@ export const typenameMap = Object.freeze(
     "SMALLINT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
     "TINYINT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
     "TIMESTAMP": Object.freeze({ phpType: "string", phpSqlType: "s" }),
+    "TEXT": Object.freeze({ phpType: "string", phpSqlType: "s" }),
     "VARCHAR": Object.freeze({ phpType: "string", phpSqlType: "s" }),
     "CHAR": Object.freeze({ phpType: "string", phpSqlType: "s" }),
     "VARBINARY": Object.freeze({ phpType: "string", phpSqlType: "s" }),
@@ -105,6 +107,7 @@ export function preprocessObject(source: any): DatabaseStructure
                 case "SMALLINT":
                 case "TINYINT":
                 case "TIMESTAMP":
+                case "TEXT":
                 {
                     break;
                 }
@@ -190,7 +193,7 @@ export function preprocessObject(source: any): DatabaseStructure
                             other,
                             otherColumns: new Map(
                                 (Iterator.prototype.map<[string, DatabaseColumn]>).call(
-                                    first[Symbol.iterator](),
+                                    second[Symbol.iterator](),
                                     (x) => [String(x), null as any])),
                         });
 
@@ -233,6 +236,12 @@ export function preprocessObject(source: any): DatabaseStructure
 
             if (constraint.otherColumns !== undefined)
             {
+                const table = tables.get(constraint.other);
+
+                if (table === undefined)
+                    throw new SyntaxError(
+                        `Unknown table: ${constraint.other}`);
+
                 for (const columnName of constraint.otherColumns.keys())
                 {
                     const column = table.columns.get(columnName);

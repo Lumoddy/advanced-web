@@ -1,13 +1,13 @@
 <?php
-    // This file was auto-generated based on ./include/api/accounts.php.
+    // This file was auto-generated based on ./include/api/search.php.
 
     declare(strict_types=1);
     require_once $_SERVER["DOCUMENT_ROOT"]."/include/common.php";
-    require_once $_SERVER["DOCUMENT_ROOT"]."/include/api/accounts.php";
+    require_once $_SERVER["DOCUMENT_ROOT"]."/include/api/search.php";
 
     header("Content-Type: application/json");
 
-    try { echo json_encode(api_logout()); }
+    try { echo json_encode(api_search()); }
     catch (api_error $e)
     {
         echo json_encode($e->as_array());

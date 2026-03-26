@@ -241,10 +241,13 @@ ALTER TABLE \``;
                     }
 
                     sql += `)
-        REFERENCES (`;
+        REFERENCES \``;
+
+                    sql += constraint.other;
+                    sql += `\` (`;
 
                     firstColumn = true;
-                    for (const [columnName] of constraint.columns)
+                    for (const [columnName] of constraint.otherColumns)
                     {
                         if (firstColumn)
                             firstColumn = false;

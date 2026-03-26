@@ -13,7 +13,7 @@ replacements:
   - - { type: TITLE }
     - { type: VARCHAR, size: (2**10)-1 }
   - - { type: DESCRIPTION }
-    - { type: VARCHAR, size: (2**16)-1 }
+    - { type: TEXT }
 
 tables:
 
@@ -68,7 +68,7 @@ tables:
       media_id: { PHP Short Single: media_id, type: ID }
       rating_rating: { PHP Short Single: rating, type: TINYINT, signed: false }
     constraints:
-    - unique:
+    - primary:
       - account_id
       - media_id
     - foreign:
@@ -98,7 +98,7 @@ tables:
       person_id: { PHP Short Single: person_id, type: ID }
       media_id: { PHP Short Single: media_id, type: ID }
     constraints:
-    - unique:
+    - primary:
       - person_id
       - media_id
     - foreign:
@@ -116,14 +116,12 @@ tables:
       media_id: { PHP Short Single: media_id, type: ID }
       review_content: { PHP Short Single: content, type: DESCRIPTION }
     constraints:
-    - unique:
+    - primary:
       - account_id
       - media_id
     - foreign:
       - - account_id
+        - media_id
       - ratings:
         - account_id
-    - foreign:
-      - - media_id
-      - ratings:
         - media_id
