@@ -4,15 +4,16 @@
 
     /**
      * @param string $fileName The path to the original image file
-     * @param int $size The maximum width or height of the thumbnail, in pixels
-     * @param ? $destination_dir The directory to save the thumbnail in,
+     * @param int|"tiny"|"small"|"medium"|"large" $size The maximum width or
+     * height of the thumbnail, in pixels
+     * @param ?string $destination_dir The directory to save the thumbnail in,
      * or null to save in the default cache directory. Must be an absolute path
      * starting with the document root
      * @return string The path to the thumbnail, relative to the document root
      */
     function into_thumbnail(
         string $fileName,
-        int $size,
+        int|string $size,
         ?string $destination_dir = null): string
     {
         if (is_null($destination_dir))
@@ -20,11 +21,28 @@
         else if (!str_starts_with($destination_dir, $_SERVER["DOCUMENT_ROOT"]))
             throw new LogicException("'\$fileName' must be an absolute path.");
 
-        $new_path = pathinfo(
-            substr($destination_dir, strlen($_SERVER["DOCUMENT_ROOT"])),
-            PATHINFO_DIRNAME)
+        switch ($size)
+        {
+            case "tiny": $size = 128; break;
+            case "small": $size = 512; break;
+            case "medium": $size = 1024; break;
+            case "large": $size = 2048; break;
+            default:
+            {
+                if (is_string($size))
+                    throw new LogicException(
+                        `Invalid size "$size". Must be an integer or one of "` +
+                        `tiny", "small", "medium", or "large".`);
+
+                break;
+            }
+        }
+
+        $new_path = substr($destination_dir, strlen($_SERVER["DOCUMENT_ROOT"]))
             ."/"
             .pathinfo($fileName, PATHINFO_FILENAME)
+            ."x"
+            .$size
             .".webp";
 
         $destination_path = $_SERVER["DOCUMENT_ROOT"].$new_path;

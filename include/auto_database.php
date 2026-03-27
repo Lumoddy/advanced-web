@@ -74,8 +74,8 @@
                 array_push(
                     $results,
                     [
-                        "image_id" => $result_id,
-                        "image_description" => $result_description,
+                        "image_id" => (int)$result_id,
+                        "image_description" => (string)$result_description,
                     ]);
             }
 
@@ -107,8 +107,8 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "description" => $result_description,
+                    "id" => (int)$result_id,
+                    "description" => (string)$result_description,
                 ]
                 : null;
 
@@ -177,10 +177,10 @@
                 array_push(
                     $results,
                     [
-                        "account_id" => $result_id,
-                        "account_username" => $result_username,
-                        "account_email" => $result_email,
-                        "account_password_hash" => $result_password_hash,
+                        "account_id" => (int)$result_id,
+                        "account_username" => (string)$result_username,
+                        "account_email" => (string)$result_email,
+                        "account_password_hash" => (string)$result_password_hash,
                     ]);
             }
 
@@ -214,10 +214,10 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "username" => $result_username,
-                    "email" => $result_email,
-                    "password_hash" => $result_password_hash,
+                    "id" => (int)$result_id,
+                    "username" => (string)$result_username,
+                    "email" => (string)$result_email,
+                    "password_hash" => (string)$result_password_hash,
                 ]
                 : null;
 
@@ -251,10 +251,10 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "username" => $result_username,
-                    "email" => $result_email,
-                    "password_hash" => $result_password_hash,
+                    "id" => (int)$result_id,
+                    "username" => (string)$result_username,
+                    "email" => (string)$result_email,
+                    "password_hash" => (string)$result_password_hash,
                 ]
                 : null;
 
@@ -264,7 +264,7 @@
         }
 
         /**
-         * @param array{id: int, title: string, description: string, cover_image_id: int} ...$rows
+         * @param array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime} ...$rows
          * @throws mysqli_sql_exception
          */
         function insert_media(array ...$rows): void
@@ -276,7 +276,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO `media` (`media_id`, `media_title`, `media_description`, `media_cover_image_id`) VALUES (?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?)", $count - 1));
+                "INSERT INTO `media` (`media_id`, `media_title`, `media_description`, `media_cover_image_id`, `media_release_date`) VALUES (?, ?, ?, ?, ?)".str_repeat(", (?, ?, ?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -286,9 +286,10 @@
                 array_push($params, $row["title"]);
                 array_push($params, $row["description"]);
                 array_push($params, $row["cover_image_id"]);
+                array_push($params, $row["release_date"]->format("YYYY-mm-dd"));
             }
 
-            $stmt->bind_param(str_repeat("issi", $count), ...$params);
+            $stmt->bind_param(str_repeat("issis", $count), ...$params);
             $stmt->execute();
             $stmt->close();
         }
@@ -296,14 +297,14 @@
         /**
          * @param string $rawCondition
          * @param mixed ...$bind_params
-         * @return array{id: int, title: string, description: string, cover_image_id: int}[]
+         * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
          * @throws mysqli_sql_exception
          */
         function select_media(string $rawCondition, ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id` FROM `media` ".$rawCondition);
+                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id`, `media_release_date` FROM `media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -312,7 +313,8 @@
                 $result_id,
                 $result_title,
                 $result_description,
-                $result_cover_image_id);
+                $result_cover_image_id,
+                $result_release_date);
 
             $stmt->execute();
 
@@ -323,10 +325,11 @@
                 array_push(
                     $results,
                     [
-                        "media_id" => $result_id,
-                        "media_title" => $result_title,
-                        "media_description" => $result_description,
-                        "media_cover_image_id" => $result_cover_image_id,
+                        "media_id" => (int)$result_id,
+                        "media_title" => (string)$result_title,
+                        "media_description" => (string)$result_description,
+                        "media_cover_image_id" => (int)$result_cover_image_id,
+                        "media_release_date" => DateTime::createFromFormat("YYYY-mm-dd", (string)$result_release_date) or throw new LogicException(`Failed to parse SQL Date.`),
                     ]);
             }
 
@@ -337,14 +340,14 @@
 
         /**
          * @param int $id
-         * @return ?array{id: int, title: string, description: string, cover_image_id: int}
+         * @return ?array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}
          * @throws mysqli_sql_exception
          */
         function get_media_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id` FROM `media` WHERE `media_id` = ?");
+                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id`, `media_release_date` FROM `media` WHERE `media_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -354,16 +357,18 @@
                 $result_id,
                 $result_title,
                 $result_description,
-                $result_cover_image_id);
+                $result_cover_image_id,
+                $result_release_date);
 
             $stmt->execute();
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "title" => $result_title,
-                    "description" => $result_description,
-                    "cover_image_id" => $result_cover_image_id,
+                    "id" => (int)$result_id,
+                    "title" => (string)$result_title,
+                    "description" => (string)$result_description,
+                    "cover_image_id" => (int)$result_cover_image_id,
+                    "release_date" => DateTime::createFromFormat("YYYY-mm-dd", (string)$result_release_date) or throw new LogicException(`Failed to parse SQL Date.`),
                 ]
                 : null;
 
@@ -430,9 +435,9 @@
                 array_push(
                     $results,
                     [
-                        "person_id" => $result_id,
-                        "person_full_name" => $result_full_name,
-                        "person_description" => $result_description,
+                        "person_id" => (int)$result_id,
+                        "person_full_name" => (string)$result_full_name,
+                        "person_description" => (string)$result_description,
                     ]);
             }
 
@@ -465,9 +470,9 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "full_name" => $result_full_name,
-                    "description" => $result_description,
+                    "id" => (int)$result_id,
+                    "full_name" => (string)$result_full_name,
+                    "description" => (string)$result_description,
                 ]
                 : null;
 
@@ -534,9 +539,9 @@
                 array_push(
                     $results,
                     [
-                        "account_id" => $result_account_id,
-                        "media_id" => $result_media_id,
-                        "rating_rating" => $result_rating,
+                        "account_id" => (int)$result_account_id,
+                        "media_id" => (int)$result_media_id,
+                        "rating_rating" => (int)$result_rating,
                     ]);
             }
 
@@ -571,9 +576,9 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "account_id" => $result_account_id,
-                    "media_id" => $result_media_id,
-                    "rating" => $result_rating,
+                    "account_id" => (int)$result_account_id,
+                    "media_id" => (int)$result_media_id,
+                    "rating" => (int)$result_rating,
                 ]
                 : null;
 
@@ -638,8 +643,8 @@
                 array_push(
                     $results,
                     [
-                        "media_id" => $result_id,
-                        "movie_length_minutes" => $result_minutes,
+                        "media_id" => (int)$result_id,
+                        "movie_length_minutes" => (int)$result_minutes,
                     ]);
             }
 
@@ -671,8 +676,8 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "id" => $result_id,
-                    "minutes" => $result_minutes,
+                    "id" => (int)$result_id,
+                    "minutes" => (int)$result_minutes,
                 ]
                 : null;
 
@@ -682,7 +687,7 @@
         }
 
         /**
-         * @param array{person_id: int, media_id: int} ...$rows
+         * @param array{person_id: int, media_id: int, job: int} ...$rows
          * @throws mysqli_sql_exception
          */
         function insert_people_in_media(array ...$rows): void
@@ -694,7 +699,7 @@
 
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "INSERT INTO `people_in_media` (`person_id`, `media_id`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+                "INSERT INTO `people_in_media` (`person_id`, `media_id`, `person_in_media_job`) VALUES (?, ?, ?)".str_repeat(", (?, ?, ?)", $count - 1));
 
             $params = [];
 
@@ -702,9 +707,10 @@
             {
                 array_push($params, $row["person_id"]);
                 array_push($params, $row["media_id"]);
+                array_push($params, $row["job"]);
             }
 
-            $stmt->bind_param(str_repeat("ii", $count), ...$params);
+            $stmt->bind_param(str_repeat("iii", $count), ...$params);
             $stmt->execute();
             $stmt->close();
         }
@@ -712,21 +718,22 @@
         /**
          * @param string $rawCondition
          * @param mixed ...$bind_params
-         * @return array{person_id: int, media_id: int}[]
+         * @return array{person_id: int, media_id: int, job: int}[]
          * @throws mysqli_sql_exception
          */
         function select_people_in_media(string $rawCondition, ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `media_id` FROM `people_in_media` ".$rawCondition);
+                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
 
             $stmt->bind_result(
                 $result_person_id,
-                $result_media_id);
+                $result_media_id,
+                $result_job);
 
             $stmt->execute();
 
@@ -737,8 +744,9 @@
                 array_push(
                     $results,
                     [
-                        "person_id" => $result_person_id,
-                        "media_id" => $result_media_id,
+                        "person_id" => (int)$result_person_id,
+                        "media_id" => (int)$result_media_id,
+                        "person_in_media_job" => (int)$result_job,
                     ]);
             }
 
@@ -750,30 +758,208 @@
         /**
          * @param int $person_id
          * @param int $media_id
-         * @return ?array{person_id: int, media_id: int}
+         * @param int $job
+         * @return ?array{person_id: int, media_id: int, job: int}
          * @throws mysqli_sql_exception
          */
-        function get_person_in_media_with_person_id_and_media_id(int $person_id, int $media_id): ?array
+        function get_person_in_media_with_person_id_and_media_id_and_job(int $person_id, int $media_id, int $job): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `media_id` FROM `people_in_media` WHERE `person_id` = ? AND `media_id` = ?");
+                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` WHERE `person_id` = ? AND `media_id` = ? AND `person_in_media_job` = ?");
 
             $stmt->bind_param(
-                "ii",
+                "iii",
                 $person_id,
-                $media_id);
+                $media_id,
+                $job);
 
             $stmt->bind_result(
                 $result_person_id,
-                $result_media_id);
+                $result_media_id,
+                $result_job);
 
             $stmt->execute();
 
             $result = $stmt->fetch()
                 ? [
-                    "person_id" => $result_person_id,
-                    "media_id" => $result_media_id,
+                    "person_id" => (int)$result_person_id,
+                    "media_id" => (int)$result_media_id,
+                    "job" => (int)$result_job,
+                ]
+                : null;
+
+            $stmt->close();
+
+            return $result;
+        }
+
+        /**
+         * @param int $media_id
+         * @param int $job
+         * @return array{person_id: int, media_id: int, job: int}[]
+         * @throws mysqli_sql_exception
+         */
+        function select_people_in_media_with_media_id_and_job(int $media_id, int $job): array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` WHERE `media_id` = ? AND `person_in_media_job` = ?");
+
+            $stmt->bind_param(
+                "ii",
+                $media_id,
+                $job);
+
+            $stmt->bind_result(
+                $result_person_id,
+                $result_media_id,
+                $result_job);
+
+            $stmt->execute();
+
+            $results = [];
+
+            while ($stmt->fetch())
+            {
+                array_push(
+                    $results,
+                    [
+                        "person_id" => (int)$result_person_id,
+                        "media_id" => (int)$result_media_id,
+                        "person_in_media_job" => (int)$result_job,
+                    ]);
+            }
+
+            $stmt->close();
+
+            return $results;
+        }
+
+        /**
+         * @param array{id: int, name: string} ...$rows
+         * @throws mysqli_sql_exception
+         */
+        function insert_person_in_media_jobs(array ...$rows): void
+        {
+            $count = count($rows);
+
+            if ($count === 0)
+                return;
+
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "INSERT INTO `person_in_media_jobs` (`person_in_media_job_id`, `person_in_media_job`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+
+            $params = [];
+
+            foreach ($rows as $row)
+            {
+                array_push($params, $row["id"]);
+                array_push($params, $row["name"]);
+            }
+
+            $stmt->bind_param(str_repeat("is", $count), ...$params);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        /**
+         * @param string $rawCondition
+         * @param mixed ...$bind_params
+         * @return array{id: int, name: string}[]
+         * @throws mysqli_sql_exception
+         */
+        function select_person_in_media_jobs(string $rawCondition, ...$bind_params): array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` ".$rawCondition);
+
+            if (is_string($bind_params[0]))
+                $stmt->bind_param(...$bind_params);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $results = [];
+
+            while ($stmt->fetch())
+            {
+                array_push(
+                    $results,
+                    [
+                        "person_in_media_job_id" => (int)$result_id,
+                        "person_in_media_job" => (string)$result_name,
+                    ]);
+            }
+
+            $stmt->close();
+
+            return $results;
+        }
+
+        /**
+         * @param int $id
+         * @return ?array{id: int, name: string}
+         * @throws mysqli_sql_exception
+         */
+        function get_person_in_media_job_with_id(int $id): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_job_id` = ?");
+
+            $stmt->bind_param(
+                "i",
+                $id);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $result = $stmt->fetch()
+                ? [
+                    "id" => (int)$result_id,
+                    "name" => (string)$result_name,
+                ]
+                : null;
+
+            $stmt->close();
+
+            return $result;
+        }
+
+        /**
+         * @param string $name
+         * @return ?array{id: int, name: string}
+         * @throws mysqli_sql_exception
+         */
+        function get_person_in_media_job_with_name(string $name): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_job` = ?");
+
+            $stmt->bind_param(
+                "s",
+                $name);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $result = $stmt->fetch()
+                ? [
+                    "id" => (int)$result_id,
+                    "name" => (string)$result_name,
                 ]
                 : null;
 
@@ -840,9 +1026,9 @@
                 array_push(
                     $results,
                     [
-                        "account_id" => $result_account_id,
-                        "media_id" => $result_media_id,
-                        "review_content" => $result_content,
+                        "account_id" => (int)$result_account_id,
+                        "media_id" => (int)$result_media_id,
+                        "review_content" => (string)$result_content,
                     ]);
             }
 
@@ -877,9 +1063,9 @@
 
             $result = $stmt->fetch()
                 ? [
-                    "account_id" => $result_account_id,
-                    "media_id" => $result_media_id,
-                    "content" => $result_content,
+                    "account_id" => (int)$result_account_id,
+                    "media_id" => (int)$result_media_id,
+                    "content" => (string)$result_content,
                 ]
                 : null;
 

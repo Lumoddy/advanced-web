@@ -17,7 +17,8 @@ CREATE TABLE `media` (
     `media_id` INT UNSIGNED NOT NULL,
     `media_title` VARCHAR(1023) NOT NULL,
     `media_description` TEXT NOT NULL,
-    `media_cover_image_id` INT UNSIGNED NOT NULL);
+    `media_cover_image_id` INT UNSIGNED NOT NULL,
+    `media_release_date` DATE NOT NULL);
 
 CREATE TABLE `people` (
     `person_id` INT UNSIGNED NOT NULL,
@@ -35,7 +36,12 @@ CREATE TABLE `movies` (
 
 CREATE TABLE `people_in_media` (
     `person_id` INT UNSIGNED NOT NULL,
-    `media_id` INT UNSIGNED NOT NULL);
+    `media_id` INT UNSIGNED NOT NULL,
+    `person_in_media_job` TINYINT UNSIGNED NOT NULL);
+
+CREATE TABLE `person_in_media_jobs` (
+    `person_in_media_job_id` TINYINT UNSIGNED NOT NULL,
+    `person_in_media_job` VARCHAR(255) NOT NULL);
 
 CREATE TABLE `reviews` (
     `account_id` INT UNSIGNED NOT NULL,
@@ -66,9 +72,15 @@ ALTER TABLE `movies`
     ADD KEY `from_fk_movies_1` (`media_id`);
 
 ALTER TABLE `people_in_media`
-    ADD PRIMARY KEY (`person_id`, `media_id`),
+    ADD PRIMARY KEY (`person_id`, `media_id`, `person_in_media_job`),
+    ADD KEY `key_people_in_media_1` (`media_id`, `person_in_media_job`),
     ADD KEY `from_fk_people_in_media_1` (`media_id`),
-    ADD KEY `from_fk_people_in_media_2` (`person_id`);
+    ADD KEY `from_fk_people_in_media_2` (`person_id`),
+    ADD KEY `from_fk_people_in_media_3` (`person_in_media_job`);
+
+ALTER TABLE `person_in_media_jobs`
+    ADD PRIMARY KEY (`person_in_media_job_id`),
+    ADD UNIQUE KEY `unique_person_in_media_jobs_1` (`person_in_media_job`);
 
 ALTER TABLE `reviews`
     ADD PRIMARY KEY (`account_id`, `media_id`),
@@ -98,7 +110,10 @@ ALTER TABLE `people_in_media`
         REFERENCES `media` (`media_id`),
     ADD CONSTRAINT `fk_people_in_media_2`
         FOREIGN KEY (`person_id`)
-        REFERENCES `people` (`person_id`);
+        REFERENCES `people` (`person_id`),
+    ADD CONSTRAINT `fk_people_in_media_3`
+        FOREIGN KEY (`person_in_media_job`)
+        REFERENCES `person_in_media_jobs` (`person_in_media_job_id`);
 
 ALTER TABLE `reviews`
     ADD CONSTRAINT `fk_reviews_1`

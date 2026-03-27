@@ -3,42 +3,41 @@ export type DatabaseColumn =
     & {
         snakeSingle: string,
         snakeShortenedSingle: string,
-        phpType: typeof typenameMap[keyof typeof typenameMap]["phpType"],
-        phpSqlType: typeof typenameMap[keyof typeof typenameMap]["phpSqlType"],
         signed: boolean,
         nullable: boolean,
     }
     & (
-        | { type: "BIGINT", size: undefined }
-        | { type: "INT", size: undefined }
-        | { type: "SMALLINT", size: undefined }
-        | { type: "TINYINT", size: undefined }
-        | { type: "TIMESTAMP", size: undefined }
-        | { type: "TEXT", size: undefined }
-        | { type: "VARCHAR", size: number }
-        | { type: "CHAR", size: number }
-        | { type: "VARBINARY", size: number }
-        | { type: "BINARY", size: number });
+        | ({ type: "BIGINT", size: undefined } & typeof typenameMap["BIGINT"])
+        | ({ type: "INT", size: undefined } & typeof typenameMap["INT"])
+        | ({ type: "SMALLINT", size: undefined } & typeof typenameMap["SMALLINT"])
+        | ({ type: "TINYINT", size: undefined } & typeof typenameMap["TINYINT"])
+        | ({ type: "DATE", size: undefined } & typeof typenameMap["DATE"])
+        | ({ type: "TEXT", size: undefined } & typeof typenameMap["TEXT"])
+        | ({ type: "VARCHAR", size: number } & typeof typenameMap["VARCHAR"])
+        | ({ type: "CHAR", size: number } & typeof typenameMap["CHAR"])
+        | ({ type: "VARBINARY", size: number } & typeof typenameMap["VARBINARY"])
+        | ({ type: "BINARY", size: number } & typeof typenameMap["BINARY"]));
 
 export type DatabaseConstraint =
     & { columns: Map<string, DatabaseColumn> }
     & (
         | { type: "primary", other: undefined, otherColumns: undefined }
         | { type: "unique", other: undefined, otherColumns: undefined }
+        | { type: "key", other: undefined, otherColumns: undefined }
         | { type: "foreign", other: string, otherColumns: Map<string, DatabaseColumn> });
 
 export const typenameMap = Object.freeze(
 {
-    "BIGINT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
-    "INT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
-    "SMALLINT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
-    "TINYINT": Object.freeze({ phpType: "int", phpSqlType: "i" }),
-    "TIMESTAMP": Object.freeze({ phpType: "string", phpSqlType: "s" }),
-    "TEXT": Object.freeze({ phpType: "string", phpSqlType: "s" }),
-    "VARCHAR": Object.freeze({ phpType: "string", phpSqlType: "s" }),
-    "CHAR": Object.freeze({ phpType: "string", phpSqlType: "s" }),
-    "VARBINARY": Object.freeze({ phpType: "string", phpSqlType: "s" }),
-    "BINARY": Object.freeze({ phpType: "string", phpSqlType: "s" }),
+    "BIGINT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
+    "INT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
+    "SMALLINT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
+    "TINYINT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
+    "TEXT": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
+    "DATE": Object.freeze({ phpType: "DateTime", phpSqlType: "s", phpFromSQL: "DateTime::createFromFormat(\"YYYY-mm-dd\", (string)$0) or throw new LogicException(`Failed to parse SQL Date.`)", phpToSQL: "$0->format(\"YYYY-mm-dd\")" }),
+    "VARCHAR": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
+    "CHAR": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
+    "VARBINARY": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
+    "BINARY": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
 });
 
 export type DatabaseTable =
@@ -95,7 +94,7 @@ export function preprocessObject(source: any): DatabaseStructure
             const snakeSingle = String(sourceColumn["PHP Single"] ?? name);
             const snakeShortenedSingle = String(sourceColumn["PHP Short Single"] ?? snakeSingle);
 
-            const type = String.prototype.toUpperCase.call(sourceColumn["type"]);
+            const type = String(sourceColumn["type"]).toUpperCase();
             const nullable = Boolean(sourceColumn["nullable"] ?? false);
             const signed = Boolean(sourceColumn["signed"] ?? true);
             let size: any;
@@ -106,8 +105,8 @@ export function preprocessObject(source: any): DatabaseStructure
                 case "INT":
                 case "SMALLINT":
                 case "TINYINT":
-                case "TIMESTAMP":
                 case "TEXT":
+                case "DATE":
                 {
                     break;
                 }
@@ -133,8 +132,10 @@ export function preprocessObject(source: any): DatabaseStructure
                 {
                     snakeSingle,
                     snakeShortenedSingle,
-                    phpType: typenameMap[type].phpType,
-                    phpSqlType: typenameMap[type].phpSqlType,
+                    phpType: typenameMap[type].phpType as any,
+                    phpSqlType: typenameMap[type].phpSqlType as any,
+                    phpFromSQL: typenameMap[type].phpFromSQL as any,
+                    phpToSQL: typenameMap[type].phpToSQL as any,
                     type,
                     size,
                     signed,
@@ -152,12 +153,11 @@ export function preprocessObject(source: any): DatabaseStructure
                 const type = sourceType.toLowerCase();
                 switch (type)
                 {
-                    case "primary":
-                    case "unique":
+                    case "primary_key":
                     {
                         constraints.push(
                         {
-                            type,
+                            type: "primary",
                             columns: new Map(
                                 (Iterator.prototype.map<[string, DatabaseColumn]>).call(
                                     sourceConstraint[sourceType][Symbol.iterator](),
@@ -168,7 +168,37 @@ export function preprocessObject(source: any): DatabaseStructure
 
                         break;
                     }
-                    case "foreign":
+                    case "unique_key":
+                    {
+                        constraints.push(
+                        {
+                            type: "unique",
+                            columns: new Map(
+                                (Iterator.prototype.map<[string, DatabaseColumn]>).call(
+                                    sourceConstraint[sourceType][Symbol.iterator](),
+                                    (x) => [String(x), null as any])),
+                            other: undefined,
+                            otherColumns: undefined,
+                        });
+
+                        break;
+                    }
+                    case "key":
+                    {
+                        constraints.push(
+                        {
+                            type: "key",
+                            columns: new Map(
+                                (Iterator.prototype.map<[string, DatabaseColumn]>).call(
+                                    sourceConstraint[sourceType][Symbol.iterator](),
+                                    (x) => [String(x), null as any])),
+                            other: undefined,
+                            otherColumns: undefined,
+                        });
+
+                        break;
+                    }
+                    case "foreign_key":
                     {
                         const [first, secondOuter] = sourceConstraint[sourceType];
 
@@ -185,7 +215,7 @@ export function preprocessObject(source: any): DatabaseStructure
 
                         constraints.push(
                         {
-                            type,
+                            type: "foreign",
                             columns: new Map(
                                 (Iterator.prototype.map<[string, DatabaseColumn]>).call(
                                     first[Symbol.iterator](),

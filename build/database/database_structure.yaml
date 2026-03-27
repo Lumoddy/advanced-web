@@ -22,7 +22,7 @@ tables:
       image_id: { PHP Short Single: id, type: ID }
       image_description: { PHP Short Single: description, type: DESCRIPTION }
     constraints:
-    - primary:
+    - primary_key:
       - image_id
 
   accounts:
@@ -32,9 +32,9 @@ tables:
       account_email: { PHP Short Single: email, type: VARCHAR, size: 320 }
       account_password_hash: { PHP Short Single: password_hash, type: HASH }
     constraints:
-    - primary:
+    - primary_key:
       - account_id
-    - unique:
+    - unique_key:
       - account_email
 
   media:
@@ -44,10 +44,11 @@ tables:
       media_title: { PHP Short Single: title, type: TITLE }
       media_description: { PHP Short Single: description, type: DESCRIPTION }
       media_cover_image_id: { PHP Short Single: cover_image_id, type: ID }
+      media_release_date: { PHP Short Single: release_date, type: DATE }
     constraints:
-    - primary:
+    - primary_key:
       - media_id
-    - foreign:
+    - foreign_key:
       - - media_cover_image_id
       - images:
         - image_id
@@ -59,7 +60,7 @@ tables:
       person_full_name: { PHP Short Single: full_name, type: NAME }
       person_description: { PHP Short Single: description, type: DESCRIPTION }
     constraints:
-    - primary:
+    - primary_key:
       - person_id
 
   ratings:
@@ -68,14 +69,14 @@ tables:
       media_id: { PHP Short Single: media_id, type: ID }
       rating_rating: { PHP Short Single: rating, type: TINYINT, signed: false }
     constraints:
-    - primary:
+    - primary_key:
       - account_id
       - media_id
-    - foreign:
+    - foreign_key:
       - - account_id
       - accounts:
         - account_id
-    - foreign:
+    - foreign_key:
       - - media_id
       - media:
         - media_id
@@ -85,9 +86,9 @@ tables:
       media_id: { PHP Short Single: id, type: ID }
       movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
     constraints:
-    - primary:
+    - primary_key:
       - media_id
-    - foreign:
+    - foreign_key:
       - - media_id
       - media:
         - media_id
@@ -97,18 +98,37 @@ tables:
     columns:
       person_id: { PHP Short Single: person_id, type: ID }
       media_id: { PHP Short Single: media_id, type: ID }
+      person_in_media_job: { PHP Short Single: job, type: ENUM }
     constraints:
-    - primary:
+    - primary_key:
       - person_id
       - media_id
-    - foreign:
+      - person_in_media_job
+    - key:
+      - media_id
+      - person_in_media_job
+    - foreign_key:
       - - media_id
       - media:
         - media_id
-    - foreign:
+    - foreign_key:
       - - person_id
       - people:
         - person_id
+    - foreign_key:
+      - - person_in_media_job
+      - person_in_media_jobs:
+        - person_in_media_job_id
+
+  person_in_media_jobs:
+    columns:
+      person_in_media_job_id: { PHP Short Single: id, type: ENUM }
+      person_in_media_job: { PHP Short Single: name, type: NAME }
+    constraints:
+    - primary_key:
+      - person_in_media_job_id
+    - unique_key:
+      - person_in_media_job
 
   reviews:
     columns:
@@ -116,10 +136,10 @@ tables:
       media_id: { PHP Short Single: media_id, type: ID }
       review_content: { PHP Short Single: content, type: DESCRIPTION }
     constraints:
-    - primary:
+    - primary_key:
       - account_id
       - media_id
-    - foreign:
+    - foreign_key:
       - - account_id
         - media_id
       - ratings:
