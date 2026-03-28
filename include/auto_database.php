@@ -687,6 +687,239 @@
         }
 
         /**
+         * @param array{media_id: int, genre: int} ...$rows
+         * @throws mysqli_sql_exception
+         */
+        function insert_genre_of_media(array ...$rows): void
+        {
+            $count = count($rows);
+
+            if ($count === 0)
+                return;
+
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "INSERT INTO `genre_of_media` (`media_id`, `genre`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+
+            $params = [];
+
+            foreach ($rows as $row)
+            {
+                array_push($params, $row["media_id"]);
+                array_push($params, $row["genre"]);
+            }
+
+            $stmt->bind_param(str_repeat("ii", $count), ...$params);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        /**
+         * @param string $rawCondition
+         * @param mixed ...$bind_params
+         * @return array{media_id: int, genre: int}[]
+         * @throws mysqli_sql_exception
+         */
+        function select_genre_of_media(string $rawCondition, ...$bind_params): array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `media_id`, `genre` FROM `genre_of_media` ".$rawCondition);
+
+            if (is_string($bind_params[0]))
+                $stmt->bind_param(...$bind_params);
+
+            $stmt->bind_result(
+                $result_media_id,
+                $result_genre);
+
+            $stmt->execute();
+
+            $results = [];
+
+            while ($stmt->fetch())
+            {
+                array_push(
+                    $results,
+                    [
+                        "media_id" => (int)$result_media_id,
+                        "genre" => (int)$result_genre,
+                    ]);
+            }
+
+            $stmt->close();
+
+            return $results;
+        }
+
+        /**
+         * @param int $media_id
+         * @param int $genre
+         * @return ?array{media_id: int, genre: int}
+         * @throws mysqli_sql_exception
+         */
+        function get_genre_of_media_with_media_id_and_genre(int $media_id, int $genre): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `media_id`, `genre` FROM `genre_of_media` WHERE `media_id` = ? AND `genre` = ?");
+
+            $stmt->bind_param(
+                "ii",
+                $media_id,
+                $genre);
+
+            $stmt->bind_result(
+                $result_media_id,
+                $result_genre);
+
+            $stmt->execute();
+
+            $result = $stmt->fetch()
+                ? [
+                    "media_id" => (int)$result_media_id,
+                    "genre" => (int)$result_genre,
+                ]
+                : null;
+
+            $stmt->close();
+
+            return $result;
+        }
+
+        /**
+         * @param array{id: int, name: string} ...$rows
+         * @throws mysqli_sql_exception
+         */
+        function insert_genres(array ...$rows): void
+        {
+            $count = count($rows);
+
+            if ($count === 0)
+                return;
+
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "INSERT INTO `genres` (`genre_id`, `genre`) VALUES (?, ?)".str_repeat(", (?, ?)", $count - 1));
+
+            $params = [];
+
+            foreach ($rows as $row)
+            {
+                array_push($params, $row["id"]);
+                array_push($params, $row["name"]);
+            }
+
+            $stmt->bind_param(str_repeat("is", $count), ...$params);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+        /**
+         * @param string $rawCondition
+         * @param mixed ...$bind_params
+         * @return array{id: int, name: string}[]
+         * @throws mysqli_sql_exception
+         */
+        function select_genres(string $rawCondition, ...$bind_params): array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `genre_id`, `genre` FROM `genres` ".$rawCondition);
+
+            if (is_string($bind_params[0]))
+                $stmt->bind_param(...$bind_params);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $results = [];
+
+            while ($stmt->fetch())
+            {
+                array_push(
+                    $results,
+                    [
+                        "genre_id" => (int)$result_id,
+                        "genre" => (string)$result_name,
+                    ]);
+            }
+
+            $stmt->close();
+
+            return $results;
+        }
+
+        /**
+         * @param int $id
+         * @return ?array{id: int, name: string}
+         * @throws mysqli_sql_exception
+         */
+        function get_genre_with_id(int $id): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `genre_id`, `genre` FROM `genres` WHERE `genre_id` = ?");
+
+            $stmt->bind_param(
+                "i",
+                $id);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $result = $stmt->fetch()
+                ? [
+                    "id" => (int)$result_id,
+                    "name" => (string)$result_name,
+                ]
+                : null;
+
+            $stmt->close();
+
+            return $result;
+        }
+
+        /**
+         * @param string $name
+         * @return ?array{id: int, name: string}
+         * @throws mysqli_sql_exception
+         */
+        function get_genre_with_name(string $name): ?array
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "SELECT `genre_id`, `genre` FROM `genres` WHERE `genre` = ?");
+
+            $stmt->bind_param(
+                "s",
+                $name);
+
+            $stmt->bind_result(
+                $result_id,
+                $result_name);
+
+            $stmt->execute();
+
+            $result = $stmt->fetch()
+                ? [
+                    "id" => (int)$result_id,
+                    "name" => (string)$result_name,
+                ]
+                : null;
+
+            $stmt->close();
+
+            return $result;
+        }
+
+        /**
          * @param array{person_id: int, media_id: int, job: int} ...$rows
          * @throws mysqli_sql_exception
          */

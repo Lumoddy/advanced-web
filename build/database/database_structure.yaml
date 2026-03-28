@@ -93,6 +93,34 @@ tables:
       - media:
         - media_id
 
+  genre_of_media:
+    PHP Single: genre_of_media
+    columns:
+      media_id: { PHP Short Single: media_id, type: ID }
+      genre: { PHP Short Single: genre, type: ENUM }
+    constraints:
+    - primary_key:
+      - media_id
+      - genre
+    - foreign_key:
+      - - media_id
+      - media:
+        - media_id
+    - foreign_key:
+      - - genre
+      - genres:
+        - genre_id
+
+  genres:
+    columns:
+      genre_id: { PHP Short Single: id, type: ENUM }
+      genre: { PHP Short Single: name, type: NAME }
+    constraints:
+    - primary_key:
+      - genre_id
+    - unique_key:
+      - genre
+
   people_in_media:
     PHP Single: person_in_media
     columns:

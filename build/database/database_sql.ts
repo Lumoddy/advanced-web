@@ -54,7 +54,6 @@ CREATE TABLE \``;
     for (const [tableName, table] of tables)
     {
         let uniqueCounter = 0;
-        let foreignCounter = 0;
         let keyCounter = 0;
         let firstConstraint = true;
         for (const constraint of table.constraints)
@@ -141,6 +140,7 @@ ALTER TABLE \``;
                     break;
                 }
                 case "key":
+                case "foreign":
                 {
                     if (firstConstraint)
                     {
@@ -163,49 +163,6 @@ ALTER TABLE \``;
 
                     keyCounter += 1;
                     sql += keyCounter;
-
-                    sql += `\` (`;
-
-                    let firstColumn = true;
-                    for (const [columnName] of constraint.columns)
-                    {
-                        if (firstColumn)
-                            firstColumn = false;
-                        else
-                            sql += `, `;
-
-                        sql += `\``;
-                        sql += columnName;
-                        sql += `\``;
-                    }
-
-                    sql += `)`;
-
-                    break;
-                }
-                case "foreign":
-                {
-                    if (firstConstraint)
-                    {
-                        sql += `
-ALTER TABLE \``;
-
-                        sql += tableName;
-                        sql += `\`
-`;
-
-                        firstConstraint = false;
-                    }
-                    else
-                        sql += `,
-`;
-
-                    sql += `    ADD KEY \`from_fk_`;
-                    sql += tableName;
-                    sql += `_`;
-
-                    foreignCounter += 1;
-                    sql += foreignCounter;
 
                     sql += `\` (`;
 

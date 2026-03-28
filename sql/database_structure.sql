@@ -34,6 +34,14 @@ CREATE TABLE `movies` (
     `media_id` INT UNSIGNED NOT NULL,
     `movie_length_minutes` SMALLINT UNSIGNED NOT NULL);
 
+CREATE TABLE `genre_of_media` (
+    `media_id` INT UNSIGNED NOT NULL,
+    `genre` TINYINT UNSIGNED NOT NULL);
+
+CREATE TABLE `genres` (
+    `genre_id` TINYINT UNSIGNED NOT NULL,
+    `genre` VARCHAR(255) NOT NULL);
+
 CREATE TABLE `people_in_media` (
     `person_id` INT UNSIGNED NOT NULL,
     `media_id` INT UNSIGNED NOT NULL,
@@ -57,26 +65,35 @@ ALTER TABLE `accounts`
 
 ALTER TABLE `media`
     ADD PRIMARY KEY (`media_id`),
-    ADD KEY `from_fk_media_1` (`media_cover_image_id`);
+    ADD KEY `key_media_1` (`media_cover_image_id`);
 
 ALTER TABLE `people`
     ADD PRIMARY KEY (`person_id`);
 
 ALTER TABLE `ratings`
     ADD PRIMARY KEY (`account_id`, `media_id`),
-    ADD KEY `from_fk_ratings_1` (`account_id`),
-    ADD KEY `from_fk_ratings_2` (`media_id`);
+    ADD KEY `key_ratings_1` (`account_id`),
+    ADD KEY `key_ratings_2` (`media_id`);
 
 ALTER TABLE `movies`
     ADD PRIMARY KEY (`media_id`),
-    ADD KEY `from_fk_movies_1` (`media_id`);
+    ADD KEY `key_movies_1` (`media_id`);
+
+ALTER TABLE `genre_of_media`
+    ADD PRIMARY KEY (`media_id`, `genre`),
+    ADD KEY `key_genre_of_media_1` (`media_id`),
+    ADD KEY `key_genre_of_media_2` (`genre`);
+
+ALTER TABLE `genres`
+    ADD PRIMARY KEY (`genre_id`),
+    ADD UNIQUE KEY `unique_genres_1` (`genre`);
 
 ALTER TABLE `people_in_media`
     ADD PRIMARY KEY (`person_id`, `media_id`, `person_in_media_job`),
     ADD KEY `key_people_in_media_1` (`media_id`, `person_in_media_job`),
-    ADD KEY `from_fk_people_in_media_1` (`media_id`),
-    ADD KEY `from_fk_people_in_media_2` (`person_id`),
-    ADD KEY `from_fk_people_in_media_3` (`person_in_media_job`);
+    ADD KEY `key_people_in_media_2` (`media_id`),
+    ADD KEY `key_people_in_media_3` (`person_id`),
+    ADD KEY `key_people_in_media_4` (`person_in_media_job`);
 
 ALTER TABLE `person_in_media_jobs`
     ADD PRIMARY KEY (`person_in_media_job_id`),
@@ -84,7 +101,7 @@ ALTER TABLE `person_in_media_jobs`
 
 ALTER TABLE `reviews`
     ADD PRIMARY KEY (`account_id`, `media_id`),
-    ADD KEY `from_fk_reviews_1` (`account_id`, `media_id`);
+    ADD KEY `key_reviews_1` (`account_id`, `media_id`);
 
 ALTER TABLE `media`
     ADD CONSTRAINT `fk_media_1`
@@ -103,6 +120,14 @@ ALTER TABLE `movies`
     ADD CONSTRAINT `fk_movies_1`
         FOREIGN KEY (`media_id`)
         REFERENCES `media` (`media_id`);
+
+ALTER TABLE `genre_of_media`
+    ADD CONSTRAINT `fk_genre_of_media_1`
+        FOREIGN KEY (`media_id`)
+        REFERENCES `media` (`media_id`),
+    ADD CONSTRAINT `fk_genre_of_media_2`
+        FOREIGN KEY (`genre`)
+        REFERENCES `genres` (`genre_id`);
 
 ALTER TABLE `people_in_media`
     ADD CONSTRAINT `fk_people_in_media_1`
