@@ -2,6 +2,7 @@
     // This file was auto-generated based on ./build/database/database_structure.yaml.
 
     declare(strict_types=1);
+
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     class auto_database_access
@@ -74,8 +75,8 @@
                 array_push(
                     $results,
                     [
-                        "image_id" => (int)$result_id,
-                        "image_description" => (string)$result_description,
+                        "id" => (int)$result_id,
+                        "description" => (string)$result_description,
                     ]);
             }
 
@@ -89,7 +90,7 @@
          * @return ?array{id: int, description: string}
          * @throws mysqli_sql_exception
          */
-        function get_image_with_id(int $id): ?array
+        function select_image_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -177,10 +178,10 @@
                 array_push(
                     $results,
                     [
-                        "account_id" => (int)$result_id,
-                        "account_username" => (string)$result_username,
-                        "account_email" => (string)$result_email,
-                        "account_password_hash" => (string)$result_password_hash,
+                        "id" => (int)$result_id,
+                        "username" => (string)$result_username,
+                        "email" => (string)$result_email,
+                        "password_hash" => (string)$result_password_hash,
                     ]);
             }
 
@@ -194,7 +195,7 @@
          * @return ?array{id: int, username: string, email: string, password_hash: string}
          * @throws mysqli_sql_exception
          */
-        function get_account_with_id(int $id): ?array
+        function select_account_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -231,7 +232,7 @@
          * @return ?array{id: int, username: string, email: string, password_hash: string}
          * @throws mysqli_sql_exception
          */
-        function get_account_with_email(string $email): ?array
+        function select_account_with_email(string $email): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -286,7 +287,7 @@
                 array_push($params, $row["title"]);
                 array_push($params, $row["description"]);
                 array_push($params, $row["cover_image_id"]);
-                array_push($params, $row["release_date"]->format("YYYY-mm-dd"));
+                array_push($params, $row["release_date"]->format("Y-m-d"));
             }
 
             $stmt->bind_param(str_repeat("issis", $count), ...$params);
@@ -325,11 +326,11 @@
                 array_push(
                     $results,
                     [
-                        "media_id" => (int)$result_id,
-                        "media_title" => (string)$result_title,
-                        "media_description" => (string)$result_description,
-                        "media_cover_image_id" => (int)$result_cover_image_id,
-                        "media_release_date" => DateTime::createFromFormat("YYYY-mm-dd", (string)$result_release_date) or throw new LogicException(`Failed to parse SQL Date.`),
+                        "id" => (int)$result_id,
+                        "title" => (string)$result_title,
+                        "description" => (string)$result_description,
+                        "cover_image_id" => (int)$result_cover_image_id,
+                        "release_date" => DateTime::createFromFormat("Y-m-d", (string)$result_release_date) or throw new LogicException("Failed to parse SQL Date."),
                     ]);
             }
 
@@ -343,7 +344,7 @@
          * @return ?array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}
          * @throws mysqli_sql_exception
          */
-        function get_media_with_id(int $id): ?array
+        function select_media_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -368,7 +369,7 @@
                     "title" => (string)$result_title,
                     "description" => (string)$result_description,
                     "cover_image_id" => (int)$result_cover_image_id,
-                    "release_date" => DateTime::createFromFormat("YYYY-mm-dd", (string)$result_release_date) or throw new LogicException(`Failed to parse SQL Date.`),
+                    "release_date" => DateTime::createFromFormat("Y-m-d", (string)$result_release_date) or throw new LogicException("Failed to parse SQL Date."),
                 ]
                 : null;
 
@@ -435,9 +436,9 @@
                 array_push(
                     $results,
                     [
-                        "person_id" => (int)$result_id,
-                        "person_full_name" => (string)$result_full_name,
-                        "person_description" => (string)$result_description,
+                        "id" => (int)$result_id,
+                        "full_name" => (string)$result_full_name,
+                        "description" => (string)$result_description,
                     ]);
             }
 
@@ -451,7 +452,7 @@
          * @return ?array{id: int, full_name: string, description: string}
          * @throws mysqli_sql_exception
          */
-        function get_person_with_id(int $id): ?array
+        function select_person_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -541,7 +542,7 @@
                     [
                         "account_id" => (int)$result_account_id,
                         "media_id" => (int)$result_media_id,
-                        "rating_rating" => (int)$result_rating,
+                        "rating" => (int)$result_rating,
                     ]);
             }
 
@@ -556,7 +557,7 @@
          * @return ?array{account_id: int, media_id: int, rating: int}
          * @throws mysqli_sql_exception
          */
-        function get_rating_with_account_id_and_media_id(int $account_id, int $media_id): ?array
+        function select_rating_with_account_id_and_media_id(int $account_id, int $media_id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -643,8 +644,8 @@
                 array_push(
                     $results,
                     [
-                        "media_id" => (int)$result_id,
-                        "movie_length_minutes" => (int)$result_minutes,
+                        "id" => (int)$result_id,
+                        "minutes" => (int)$result_minutes,
                     ]);
             }
 
@@ -658,7 +659,7 @@
          * @return ?array{id: int, minutes: int}
          * @throws mysqli_sql_exception
          */
-        function get_movie_with_id(int $id): ?array
+        function select_movie_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -758,7 +759,7 @@
          * @return ?array{media_id: int, genre: int}
          * @throws mysqli_sql_exception
          */
-        function get_genre_of_media_with_media_id_and_genre(int $media_id, int $genre): ?array
+        function select_genre_of_media_with_media_id_and_genre(int $media_id, int $genre): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -843,8 +844,8 @@
                 array_push(
                     $results,
                     [
-                        "genre_id" => (int)$result_id,
-                        "genre" => (string)$result_name,
+                        "id" => (int)$result_id,
+                        "name" => (string)$result_name,
                     ]);
             }
 
@@ -858,7 +859,7 @@
          * @return ?array{id: int, name: string}
          * @throws mysqli_sql_exception
          */
-        function get_genre_with_id(int $id): ?array
+        function select_genre_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -891,7 +892,7 @@
          * @return ?array{id: int, name: string}
          * @throws mysqli_sql_exception
          */
-        function get_genre_with_name(string $name): ?array
+        function select_genre_with_name(string $name): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -979,7 +980,7 @@
                     [
                         "person_id" => (int)$result_person_id,
                         "media_id" => (int)$result_media_id,
-                        "person_in_media_job" => (int)$result_job,
+                        "job" => (int)$result_job,
                     ]);
             }
 
@@ -995,7 +996,7 @@
          * @return ?array{person_id: int, media_id: int, job: int}
          * @throws mysqli_sql_exception
          */
-        function get_person_in_media_with_person_id_and_media_id_and_job(int $person_id, int $media_id, int $job): ?array
+        function select_person_in_media_with_person_id_and_media_id_and_job(int $person_id, int $media_id, int $job): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -1125,8 +1126,8 @@
                 array_push(
                     $results,
                     [
-                        "person_in_media_job_id" => (int)$result_id,
-                        "person_in_media_job" => (string)$result_name,
+                        "id" => (int)$result_id,
+                        "name" => (string)$result_name,
                     ]);
             }
 
@@ -1140,7 +1141,7 @@
          * @return ?array{id: int, name: string}
          * @throws mysqli_sql_exception
          */
-        function get_person_in_media_job_with_id(int $id): ?array
+        function select_person_in_media_job_with_id(int $id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -1173,7 +1174,7 @@
          * @return ?array{id: int, name: string}
          * @throws mysqli_sql_exception
          */
-        function get_person_in_media_job_with_name(string $name): ?array
+        function select_person_in_media_job_with_name(string $name): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -1261,7 +1262,7 @@
                     [
                         "account_id" => (int)$result_account_id,
                         "media_id" => (int)$result_media_id,
-                        "review_content" => (string)$result_content,
+                        "content" => (string)$result_content,
                     ]);
             }
 
@@ -1276,7 +1277,7 @@
          * @return ?array{account_id: int, media_id: int, content: string}
          * @throws mysqli_sql_exception
          */
-        function get_review_with_account_id_and_media_id(int $account_id, int $media_id): ?array
+        function select_review_with_account_id_and_media_id(int $account_id, int $media_id): ?array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,

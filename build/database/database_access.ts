@@ -6,6 +6,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
 
     let php = `
     declare(strict_types=1);
+
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     class auto_database_access
@@ -222,7 +223,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
         for (const [columnName, column] of columns)
         {
             php += `                        "`;
-            php += columnName;
+            php += column.snakeShortenedSingle;
             php += `" => `;
             php += column.phpFromSQL.replaceAll("$0", `$result_${column.snakeShortenedSingle}`);
             php += `,
@@ -286,7 +287,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
                     php += `}
          * @throws mysqli_sql_exception
          */
-        function get_`;
+        function select_`;
 
                     php += table.snakeSingle;
                     php += `_with`;

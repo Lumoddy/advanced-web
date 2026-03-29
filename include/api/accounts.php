@@ -1,7 +1,7 @@
 <?php
     declare(strict_types=1);
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/api/common.php";
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/database.php";
+    require_once __DIR__."/common.php";
+    require_once __DIR__."/../database.php";
 
     /**
      * Public API
@@ -10,7 +10,8 @@
      */
     function api_login(): array
     {
-        session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
 
         if (request_param_bool("new") ?? false)
         {
@@ -76,6 +77,7 @@
                         throw $e;
                 }
             }
+            finally { $connection->close(); }
 
             $_SESSION["account_id"] = $account["id"];
             $_SESSION["account_username"] = $account["username"];
@@ -110,27 +112,32 @@
                     "The provided identifier is too long.");
 
             $connection = new database_access();
-            $account = $connection->get_account_with_email($posted_identifier);
 
-            if (!is_null($account)
-                && password_verify($posted_password, $account["password_hash"]))
+            try
             {
-                $matching_account = $account;
-            }
+                $account = $connection->select_account_with_email($posted_identifier);
 
-            if (is_null($matching_account))
-            {
-                foreach ($connection->get_accounts_with_username($posted_identifier) as $account)
+                if (!is_null($account)
+                    && password_verify($posted_password, $account["password_hash"]))
                 {
-                    if (password_verify($posted_password, $account["password_hash"]))
+                    $matching_account = $account;
+                }
+
+                if (!isset($matching_account))
+                {
+                    foreach ($connection->select_accounts_with_username($posted_identifier) as $account)
                     {
-                        $matching_account = $account;
-                        break;
+                        if (password_verify($posted_password, $account["password_hash"]))
+                        {
+                            $matching_account = $account;
+                            break;
+                        }
                     }
                 }
             }
+            finally { $connection->close(); }
 
-            if (is_null($matching_account))
+            if (!isset($matching_account))
                 throw new api_error(
                     "login/not-found",
                     "No account was found with that email or password.");
@@ -156,7 +163,8 @@
      */
     function api_account_info(): array
     {
-        session_start();
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
 
         return isset($_SESSION["account_id"])
             ? [

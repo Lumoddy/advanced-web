@@ -1,7 +1,8 @@
 <?php
     declare(strict_types=1);
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/mysqli_errors.php";
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/auto_database.php";
+    require_once __DIR__."/mysqli_errors.php";
+    require_once __DIR__."/auto_database.php";
+
     mysqli_report(MYSQLI_REPORT_ERROR | MYSQLI_REPORT_STRICT);
 
     /**
@@ -28,7 +29,7 @@
          * @return array{id: int, username: string, email: string, password_hash: string}[]
          * @throws mysqli_sql_exception
          */
-        public function get_accounts_with_username(string $username): array
+        public function select_accounts_with_username(string $username): array
         {
             return $this->select_accounts(
                 "WHERE account_username = ?",

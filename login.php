@@ -1,14 +1,9 @@
 <?php
     declare(strict_types=1);
-  try {
-    require_once $_SERVER["DOCUMENT_ROOT"]."/include/api/accounts.php";
+    require_once __DIR__."/include/api/accounts.php";
 
-    session_start();
-
-    $redirect = request_param("r");
-
-    $new = request_param_bool("new") ?? false;
-
+    $posted_redirect = request_param("r");
+    $posted_if_new = request_param_bool("new") ?? false;
     $posted_email = posted_param("email");
     $posted_password = posted_param("password");
     $posted_username = posted_param("username");
@@ -16,7 +11,7 @@
         ?? $posted_email
         ?? $posted_username;
 
-    if ($new
+    if ($posted_if_new
         ? !is_null($posted_email)
             || !is_null($posted_password)
             || !is_null($posted_username)
@@ -27,7 +22,7 @@
         {
             api_login();
 
-            header("Location: ".($redirect ?? "/"));
+            header("Location: ".($posted_redirect ?? "/"));
             exit;
         }
         catch (api_error $e)
@@ -50,7 +45,7 @@
       <form
         id="create-account-form"
         class="create-account-variant variant-slide<?php
-            if (!$new)
+            if (!$posted_if_new)
             {
                 ?> variant-slide-hidden<?php
             }
@@ -66,7 +61,7 @@
             type="email"
             class="glass"
             autocomplete="email"
-            tabindex="<?php echo $new ? "0" : "-1" ?>"
+            tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>"
             <?php
                 if (!is_null($posted_email))
                 {
@@ -85,7 +80,7 @@
             type="text"
             class="glass"
             autocomplete="username"
-            tabindex="<?php echo $new ? "0" : "-1" ?>"
+            tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>"
             <?php
                 if (!is_null($posted_username))
                 {
@@ -104,7 +99,7 @@
             type="password"
             class="glass"
             autocomplete="new-password"
-            tabindex="<?php echo $new ? "0" : "-1" ?>">
+            tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>">
         </p>
         <p>
           <label>Confirm Password</label>
@@ -115,11 +110,11 @@
             type="password"
             class="glass"
             autocomplete="off"
-            tabindex="<?php echo $new ? "0" : "-1" ?>">
+            tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>">
         </p>
         <input type="hidden" name="new" value="">
         <?php
-            if ($new && is_string($error))
+            if ($posted_if_new && isset($error))
             {
                 ?><p class="error"><?php
                 echo $error;
@@ -130,12 +125,12 @@
           id="create-account-submit"
           type="submit"
           class="glass"
-          tabindex="<?php echo $new ? "0" : "-1" ?>">Create Account</button>
+          tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>">Create Account</button>
       </form>
       <form
         id="login-form"
         class="login-variant variant-slide<?php
-            if ($new)
+            if ($posted_if_new)
             {
                 ?> variant-slide-hidden<?php
             }
@@ -152,7 +147,7 @@
             type="email"
             class="glass"
             autocomplete="email"
-            tabindex="<?php echo $new ? "-1" : "0" ?>"
+            tabindex="<?php echo $posted_if_new ? "-1" : "0" ?>"
             <?php
                 if (!is_null($posted_identifier))
                 {
@@ -171,10 +166,10 @@
             type="password"
             class="glass"
             autocomplete="password"
-            tabindex="<?php echo $new ? "-1" : "0" ?>">
+            tabindex="<?php echo $posted_if_new ? "-1" : "0" ?>">
         </p>
         <?php
-            if (!$new && is_string($error))
+            if (!$posted_if_new && isset($error))
             {
                 ?><p class="error"><?php
                 echo $error;
@@ -185,7 +180,7 @@
           id="login-submit"
           type="submit"
           class="glass"
-          tabindex="<?php echo $new ? "-1" : "0" ?>">Login</button>
+          tabindex="<?php echo $posted_if_new ? "-1" : "0" ?>">Login</button>
       </form>
     </variant-div>
     <hr>
@@ -193,48 +188,40 @@
       <a
         id="create-account-instead"
         href="/login.php?new<?php
-            if (!is_null($redirect))
+            if (!is_null($posted_redirect))
             {
                 ?>&r=<?php
-                echo urlencode($redirect);
+                echo urlencode($posted_redirect);
             }
         ?>"
         class="login-variant variant-slide<?php
-            if ($new)
+            if ($posted_if_new)
             {
                 ?> variant-slide-hidden<?php
             }
         ?>"
-        tabindex="<?php echo $new ? "-1" : "0" ?>">
+        tabindex="<?php echo $posted_if_new ? "-1" : "0" ?>">
         Create Account Instead
       </a>
       <a
         id="login-instead"
         href="/login.php<?php
-            if (!is_null($redirect))
+            if (!is_null($posted_redirect))
             {
                 ?>?r=<?php
-                echo urlencode($redirect);
+                echo urlencode($posted_redirect);
             }
         ?>"
         class="create-account-variant variant-slide<?php
-            if (!$new)
+            if (!$posted_if_new)
             {
                 ?> variant-slide-hidden<?php
             }
         ?>"
-        tabindex="<?php echo $new ? "0" : "-1" ?>">
+        tabindex="<?php echo $posted_if_new ? "0" : "-1" ?>">
         Use Existing Account Instead
       </a>
     </variant-div>
   </section>
 </body>
 </html>
-<?php
-}
-        catch (Throwable $e)
-        {
-            echo $e;
-            exit;
-        }
-?>

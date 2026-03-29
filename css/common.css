@@ -2,8 +2,6 @@
 
 :root
 {
-    background-image: radial-gradient(#444 50%, #333 50%);
-
     --font-code: "JetBrains Mono", monospace;
     --font-small: "Montserrat", sans-serif;
     --font-normal: "Funnel Sans", sans-serif;
@@ -199,6 +197,35 @@ input[type="button"], input[type="submit"], button
 .shine
 {
     &::before { animation: linear-shine 3.5s linear infinite }
+}
+
+nav
+{
+    display: flex;
+    flex-flow: row nowrap;
+    justify-content: start;
+    align-items: start;
+    align-content: start;
+    gap: 16px;
+}
+
+.media
+{
+    width: min-content;
+
+    & > div
+    {
+        width: 100px;
+        height: 150px;
+        background-size: cover;
+        background-position: center;
+    }
+
+    & > h3
+    {
+        margin: 4px;
+        font-size: small;
+    }
 }
 
 .variant-slide

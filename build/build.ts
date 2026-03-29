@@ -95,6 +95,8 @@ ${phpFileFrom(databaseStructure)}?>`,
 
                             const opPath = `${dirent.parentPath.replace(/^\.\/include\/api/, "./json")}/${opName}.php`;
 
+                            const rootRelativeToOpPath = opPath.replaceAll(/(?:^\.\/[^\/]+)?\/[^\/]+/g, "/..");
+
                             declaredShapes.set(opPath, { shape, errors });
 
                             await fs.writeFile(
@@ -103,8 +105,8 @@ ${phpFileFrom(databaseStructure)}?>`,
     // This file was auto-generated based on ${path}.
 
     declare(strict_types=1);
-    require_once $_SERVER["DOCUMENT_ROOT"]."/include/common.php";
-    require_once $_SERVER["DOCUMENT_ROOT"]."${path.replace(/^\./, "")}";
+    require_once __DIR__."${rootRelativeToOpPath}/include/common.php";
+    require_once __DIR__."${rootRelativeToOpPath}${path.substring(1)}";
 
     header("Content-Type: application/json");
 

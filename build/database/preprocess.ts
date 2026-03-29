@@ -33,7 +33,7 @@ export const typenameMap = Object.freeze(
     "SMALLINT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
     "TINYINT": Object.freeze({ phpType: "int", phpSqlType: "i", phpFromSQL: "(int)$0", phpToSQL: "$0" }),
     "TEXT": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
-    "DATE": Object.freeze({ phpType: "DateTime", phpSqlType: "s", phpFromSQL: "DateTime::createFromFormat(\"YYYY-mm-dd\", (string)$0) or throw new LogicException(`Failed to parse SQL Date.`)", phpToSQL: "$0->format(\"YYYY-mm-dd\")" }),
+    "DATE": Object.freeze({ phpType: "DateTime", phpSqlType: "s", phpFromSQL: "DateTime::createFromFormat(\"Y-m-d\", (string)$0) or throw new LogicException(\"Failed to parse SQL Date.\")", phpToSQL: "$0->format(\"Y-m-d\")" }),
     "VARCHAR": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
     "CHAR": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),
     "VARBINARY": Object.freeze({ phpType: "string", phpSqlType: "s", phpFromSQL: "(string)$0", phpToSQL: "$0" }),

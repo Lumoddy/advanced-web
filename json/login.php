@@ -2,8 +2,8 @@
     // This file was auto-generated based on ./include/api/accounts.php.
 
     declare(strict_types=1);
-    require_once $_SERVER["DOCUMENT_ROOT"]."/include/common.php";
-    require_once $_SERVER["DOCUMENT_ROOT"]."/include/api/accounts.php";
+    require_once __DIR__."/../include/common.php";
+    require_once __DIR__."/../include/api/accounts.php";
 
     header("Content-Type: application/json");
 

@@ -1,9 +1,6 @@
 <?php
     declare(strict_types=1);
 
-    strtotime("");
-    date("Y-m-d", 1);
-
     /**
      * A recoverable, public error that would be returned by the API.
      */

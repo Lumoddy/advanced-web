@@ -1,41 +1,77 @@
 <?php
     declare(strict_types=1);
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/api/common.php";
-    require_once $_SERVER['DOCUMENT_ROOT']."/include/database.php";
+    require_once __DIR__."/common.php";
+    require_once __DIR__."/../database.php";
 
     /**
      * Public API
-     * @return array{id: int, title: string, description: string, cover_image_id: int}[]
+     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
      * @throws api_error
      */
-    function api_search(): array
+    function api_search_media(): array
     {
-        session_start();
+        $posted_search = request_param("q") ?? "";
 
-        $posted_search = request_param("q");
+        $posted_limit = request_param_int("limit");
+        if ($posted_limit === null || $posted_limit === false)
+            $posted_limit = 25;
 
-        if (is_null($posted_search))
-            return [];
-
-        if (strlen($posted_search) === 0)
-        {
-            ?>[]<?php
-            http_response_code(200);
-            exit;
-        }
-
-        $searching_media = isset($_GET["movies"]) && $_GET["movies"] !== "false";
-        $searching_limit = isset($_GET["limit"])
-            ? (int)max((int)min((int)$_GET["limit"], 0), 25)
-            : 10;
+        $posted_limit = (int)max((int)min($posted_limit, 0), 100);
 
         $connection = new database_access();
 
-        return $connection->select_media(
+        try
+        {
+            return $connection->select_media(
                 "WHERE `media_title` LIKE CONCAT(\"%\", ?, \"%\") ORDER BY LOCATE(?, `media_title`) DESC LIMIT ?",
                 "ssi",
                 $posted_search,
                 $posted_search,
-                $searching_limit);
+                $posted_limit);
+        }
+        finally { $connection->close(); }
+    }
+
+    /**
+     * Public API
+     * @return ?array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}
+     * @throws api_error
+     */
+    function api_media_info(): ?array
+    {
+        $posted_id = request_param_int("id");
+
+        if ($posted_id === null || $posted_id === false)
+            return null;
+
+        $connection = new database_access();
+
+        try { return $connection->select_media_with_id($posted_id); }
+        finally { $connection->close(); }
+    }
+
+    /**
+     * Public API
+     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
+     * @throws api_error
+     */
+    function api_random_media(): array
+    {
+        $posted_limit = request_param_int("limit");
+        if ($posted_limit === null || $posted_limit === false)
+            $posted_limit = 25;
+
+        $posted_limit = (int)max((int)min($posted_limit, 0), 100);
+
+        $connection = new database_access();
+
+        try
+        {
+            return $connection->select_media(
+                "ORDER BY RAND() LIMIT ?",
+                "i",
+                $posted_limit);
+        }
+        finally { $connection->close(); }
     }
 ?>
