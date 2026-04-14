@@ -4,36 +4,19 @@
     require_once __DIR__."/include/api/search.php";
 
     $media = api_random_media();
-
-    $account = api_account_info();
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./css/common.css">
-  <script type="module" src="./js/common.js"></script>
+  <title>Newly Nostalgic</title>
+  <?php require __DIR__."/part/default_head.php" ?>
 </head>
 <body>
-  <nav class="panel">
-    <span class="logo">Newly Nostalgic</span>
-    <?php
-        if ($account["is_logged_in"])
-        {
-            ?><span>Logged in as:</span><span><?php
-              echo $account["username"]
-            ?></span><a href="./logout.php">Log Out</a><?php
-        }
-        else
-        {
-            ?><a href="./login.php">Login</a><?php
-        }
-    ?>
-  </nav>
+  <div<?php require __DIR__."/part/background.php" ?>/div>
+  <nav<?php require __DIR__."/part/navigation_bar.php" ?>/nav>
   <main
     style="
-      margin: 8px;
+      margin: 16px;
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
@@ -44,9 +27,19 @@
         foreach ($media as $entry)
         {
             ?>
-              <a class="panel media" href="./media.php?id=<?php echo $entry["id"] ?>">
-                <div style="background-image: url(./img/<?php echo $entry["id"] ?>.jpg);"></div>
-                <h3><?php echo $entry["title"] ?></h3>
+              <a
+                class="glass panel"
+                href="./media.php?id=<?php echo $entry["id"] ?>"
+                style="width: 140px">
+                <img
+                  src="./img/<?php echo $entry["id"] ?>.jpg"
+                  style="width: 100%; aspect-ratio: 2/3;">
+                <div style="margin: 4px 8px 4px;">
+                  <h3
+                    style="margin: 0; font-size: medium">
+                    <?php echo $entry["title"] ?>
+                  </h3>
+                </div>
               </a>
             <?php
         }

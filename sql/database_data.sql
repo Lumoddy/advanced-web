@@ -249,7 +249,7 @@ SET @media_title = "Dhurandhar The Revenge";
 
 INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
-    (6 + 100, @media_title, (60 * 3) + 50, "2026-03-19", "Jaskirat Singh Rangi descends deeper into his alias as Hamza Ali Mazari, rising through Karachi's criminal hierarchy to claim the feared title \"Sher-e-Baloch\" while balancing loyalty, betrayal, and survival in a ruthless underworld.");
+    (6 + 100, @media_title, (60 * 3) + 50, "2026-03-19", "Jaskirat Singh Rangi descends deeper into his alias as Hamza Ali Mazari, rising through Karachi's criminal hierarchy to claim the feared title ""Sher-e-Baloch"" while balancing loyalty, betrayal, and survival in a ruthless underworld.");
 
 INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
@@ -525,7 +525,7 @@ SET @media_title = "Good Luck, Have Fun, Don't Die";
 
 INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
-    (13 + 100, @media_title, (60 * 2) + 14, "2026-02-13", "A \"Man From the Future\" arrives at a diner in Los Angeles where he must recruit the precise combination of disgruntled patrons to join him on a one-night quest to save the world from the terminal threat of a rogue artificial intelligence.");
+    (13 + 100, @media_title, (60 * 2) + 14, "2026-02-13", "A ""Man From the Future"" arrives at a diner in Los Angeles where he must recruit the precise combination of disgruntled patrons to join him on a one-night quest to save the world from the terminal threat of a rogue artificial intelligence.");
 
 INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
@@ -1233,7 +1233,7 @@ SET @media_title = "Heel";
 
 INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
-    (32 + 100, @media_title, (60 * 1) + 50, "2026-03-06", "A 19-year-old criminal, Tommy, is kidnapped and forced into a rehabilitation process by a dysfunctional couple, Chris and Kathryn, who try to make him a \"good boy.\" Tommy must find a way to escape.");
+    (32 + 100, @media_title, (60 * 1) + 50, "2026-03-06", "A 19-year-old criminal, Tommy, is kidnapped and forced into a rehabilitation process by a dysfunctional couple, Chris and Kathryn, who try to make him a ""good boy."" Tommy must find a way to escape.");
 
 INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
@@ -1892,7 +1892,7 @@ VALUES
 INSERT INTO `images` (`image_id`, `image_description`)
 SELECT
     `media_id`,
-    CONCAT("The cover image for the movie \"", `media_title`, "\".")
+    CONCAT("The cover image for the movie """, `media_title`, """.")
 FROM
     `movies_source`;
 

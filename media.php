@@ -16,27 +16,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <title>Login</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <link rel="stylesheet" href="./css/common.css">
-  <script type="module" src="./js/common.js"></script>
+  <title>Newly Nostalgic - Media</title>
+  <?php require __DIR__."/part/default_head.php" ?>
 </head>
 <body>
-  <nav class="panel">
-    <span class="logo">Newly Nostalgic</span>
-    <?php
-        if ($account["is_logged_in"])
-        {
-            ?><span>Logged in as:</span><span><?php
-              echo $account["username"]
-            ?></span><a href="./logout.php">Log Out</a><?php
-        }
-        else
-        {
-            ?><a href="./login.php">Login</a><?php
-        }
-    ?>
-  </nav>
+  <div<?php require __DIR__."/part/background.php" ?>/div>
+  <nav<?php require __DIR__."/part/navigation_bar.php" ?>/nav>
   <div
     style="
       display: flex;

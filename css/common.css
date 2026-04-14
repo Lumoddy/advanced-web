@@ -10,6 +10,11 @@
     color-scheme: dark;
 }
 
+body
+{
+    margin: 0;
+}
+
 @property --shine { syntax: "<number>"; inherits: true; initial-value: 0; }
 
 @keyframes linear-shine
@@ -26,18 +31,29 @@
     to { --progress: 1.0 }
 }
 
+.center
+{
+    text-align: center;
+}
+
+img
+{
+    padding: 8px;
+    border: 2px solid #666;
+    border-radius: 12px;
+    box-shadow: 0 4px 32px #0002, inset 0 -4px 8px #0002;
+    object-fit: cover;
+    object-position: center;
+}
+
 .panel
 {
+    margin: 8px 4px 4px;
     padding: 4px;
     border: 2px solid #666;
-    border-radius: 8px;
+    border-radius: 12px;
     background: linear-gradient(to bottom, #555, #444);
     box-shadow: 0 4px 32px #0002, inset 0 -4px 8px #0002;
-
-    &.center
-    {
-        text-align: center;
-    }
 
     & > hr
     {
@@ -45,84 +61,33 @@
         border: 2px solid transparent;
         border-top: 2px solid #666;
     }
-}
 
-input[type="text"], input[type="email"], input[type="password"]
-{
-    margin: 6px 4px 2px;
-    padding: 4px;
-    border: 2px solid #666;
-    max-width: calc(100px + 20vw);
-    border-radius: 8px;
-    position: relative;
-    background: linear-gradient(to bottom, #444, #444);
-    appearance: none;
-    box-shadow: inset 0 4px 8px #0004;
-    font-size: large;
-    text-shadow: 0 2px 8px #0008;
-
-    &:hover, &:focus-visible
+    & > img
     {
-        border-color: #CCC;
-    }
-}
-
-input[type="button"], input[type="submit"], button
-{
-    margin: 6px 4px 2px;
-    padding: 4px;
-    border: 2px solid #666;
-    max-width: calc(100px + 20vw);
-    border-radius: 8px;
-    position: relative;
-    background: linear-gradient(to bottom, #444, #444);
-    appearance: none;
-    box-shadow: 0 4px 8px #0004;
-    font-size: large;
-    text-shadow: 0 2px 8px #0008;
-
-    &:hover, &:focus-visible
-    {
-        border-color: #CCC;
+        padding: 0;
+        border: none;
+        border-radius: 6px;
+        box-shadow: 0 4px 8px #0004;
     }
 
-    &:active
+    & *
     {
-        border-color: #666;
-    }
-}
-
-@media not (prefers-reduced-transparency), all
-{
-    .glass.panel
-    {
-        border-color: #AAA6;
-        background: linear-gradient(to bottom, #AAA6, #AAA4);
-        backdrop-filter: blur(4px);
-        box-shadow: 0 4px 32px #0004, inset 0 4px 8px #0002;
-
-        & > hr
-        {
-            border-top-color: #AAA6;
-        }
-
-        & > *
-        {
-            text-shadow: 0 2px 8px #0008;
-        }
+        text-shadow: none;
     }
 
-    .glass:is(input[type="text"], input[type="email"], input[type="password"])
+    & input[type="text"], & input[type="email"], & input[type="password"]
     {
-        border-color: #AAA6;
-        background: linear-gradient(to bottom, #AAA6, #AAA4);
-        box-shadow: inset 0 4px 16px #0004;
+        margin: 6px 4px 2px;
+        padding: 4px;
+        border: 2px solid #666;
+        max-width: calc(100px + 20vw);
+        border-radius: 8px;
+        position: relative;
+        background: linear-gradient(to bottom, #444, #444);
+        appearance: none;
+        box-shadow: inset 0 4px 8px #0004;
+        font-size: large;
         text-shadow: 0 2px 8px #0008;
-
-        .panel.glass &
-        {
-            background: transparent;
-        }
 
         &:hover, &:focus-visible
         {
@@ -130,11 +95,18 @@ input[type="button"], input[type="submit"], button
         }
     }
 
-    .glass:is(input[type="button"], input[type="submit"], button)
+    & input[type="button"], & input[type="submit"], & button
     {
-        border-color: #AAA6;
-        background: linear-gradient(to bottom, #AAA6, #AAA4);
-        box-shadow: 0 4px 16px #0004;
+        margin: 6px 4px 2px;
+        padding: 4px;
+        border: 2px solid #666;
+        max-width: calc(100px + 20vw);
+        border-radius: 8px;
+        position: relative;
+        background: linear-gradient(to bottom, #444, #444);
+        appearance: none;
+        box-shadow: 0 4px 8px #0004;
+        font-size: large;
         text-shadow: 0 2px 8px #0008;
 
         &:hover, &:focus-visible
@@ -144,87 +116,142 @@ input[type="button"], input[type="submit"], button
 
         &:active
         {
-            border-color: #AAA6;
+            border-color: #666;
         }
     }
-}
 
-@media not (prefers-reduced-motion), all
-{
-    input[type="text"], input[type="email"], input[type="password"],
-    input[type="button"], input[type="submit"], button
+    &:is(a)
     {
-        transition:
-            margin-inline ease-out 0.2s,
-            padding-inline ease-out 0.2s;
-
         &:hover, &:focus-visible
         {
-            margin-inline: 0px;
-            padding-inline: 8px;
+            border-color: #CCC;
+        }
+
+        &:active
+        {
+            border-color: #666;
+        }
+
+        @media not (prefers-reduced-motion), all
+        {
+            margin-block: 8px 4px;
             transition:
-                margin-inline ease-out 0.1s,
-                padding-inline ease-out 0.1s;
+                margin-block ease-out 0.2s;
+
+            &:hover, &:focus-visible
+            {
+                margin-block: calc(8px - 4px) calc(4px + 4px);
+                transition:
+                    margin-block ease-out 0.1s;
+            }
         }
     }
-}
 
-.manual-shine, .shine
-{
-    position: relative;
-
-    &::before
+    @media not (prefers-reduced-transparency), all
     {
-        content: "";
-        margin: -2px;
-        border: 2px solid transparent;
-        border-radius: 8px;
-        position: absolute; top: 0; bottom: 0; left: 0; right: 0;
-        background: linear-gradient(
-            135deg,
-            transparent calc((-100px - 20%) + (var(--shine) * 200vmax)),
-            #FFF calc((-100px - 20%) + 1vmax + (var(--shine) * 200vmax)),
-            #FFF calc(0px - 1vmax + (var(--shine) * 200vmax)),
-            transparent calc(0px + (var(--shine) * 200vmax)))
-            border-box;
-        mask:
-            linear-gradient(to bottom, #FFF, #FFF8) border-box subtract,
-            linear-gradient(to bottom, #FFFA, #FFFE) padding-box;
-        pointer-events: none;
+        &.glass
+        {
+            border-color: #AAA6;
+            background: linear-gradient(to bottom, #AAA6, #AAA4);
+            backdrop-filter: blur(4px);
+            box-shadow: 0 4px 32px #0004, inset 0 4px 8px #0002;
+
+            & > hr
+            {
+                border-top-color: #AAA6;
+            }
+
+            & *
+            {
+                text-shadow: 0 2px 8px #0008;
+            }
+        }
+
+        & .glass:is(input[type="text"], input[type="email"], input[type="password"])
+        {
+            border-color: #AAA6;
+            background: linear-gradient(to bottom, #AAA6, #AAA4);
+            box-shadow: inset 0 4px 16px #0004;
+            text-shadow: 0 2px 8px #0008;
+
+            .panel.glass &
+            {
+                background: transparent;
+            }
+
+            &:hover, &:focus-visible
+            {
+                border-color: #CCC;
+            }
+        }
+
+        & .glass:is(input[type="button"], input[type="submit"], button)
+        {
+            border-color: #AAA6;
+            background: linear-gradient(to bottom, #AAA6, #AAA4);
+            box-shadow: 0 4px 16px #0004;
+            text-shadow: 0 2px 8px #0008;
+
+            &:hover, &:focus-visible
+            {
+                border-color: #CCC;
+            }
+
+            &:active
+            {
+                border-color: #AAA6;
+            }
+        }
     }
-}
 
-.shine
-{
-    &::before { animation: linear-shine 3.5s linear infinite }
-}
-
-nav
-{
-    display: flex;
-    flex-flow: row nowrap;
-    justify-content: start;
-    align-items: start;
-    align-content: start;
-    gap: 16px;
-}
-
-.media
-{
-    width: min-content;
-
-    & > div
+    @media not (prefers-reduced-motion), all
     {
-        width: 100px;
-        height: 150px;
-        background-size: cover;
-        background-position: center;
+        & input[type="text"], & input[type="email"], & input[type="password"],
+        & input[type="button"], & input[type="submit"], & button
+        {
+            transition:
+                margin-inline ease-out 0.2s,
+                padding-inline ease-out 0.2s;
+
+            &:hover, &:focus-visible
+            {
+                margin-inline: 0px;
+                padding-inline: 8px;
+                transition:
+                    margin-inline ease-out 0.1s,
+                    padding-inline ease-out 0.1s;
+            }
+        }
     }
 
-    & > h3
+    &.shine, &.auto-shine
     {
-        margin: 4px;
-        font-size: small;
+        position: relative;
+
+        &::before
+        {
+            content: "";
+            margin: -2px;
+            border: 2px solid transparent;
+            border-radius: 8px;
+            position: absolute; top: 0; bottom: 0; left: 0; right: 0;
+            background: linear-gradient(
+                135deg,
+                transparent calc((-100px - 20%) + (var(--shine) * 200vmax)),
+                #FFF calc((-100px - 20%) + 1vmax + (var(--shine) * 200vmax)),
+                #FFF calc(0px - 1vmax + (var(--shine) * 200vmax)),
+                transparent calc(0px + (var(--shine) * 200vmax)))
+                border-box;
+            mask:
+                linear-gradient(to bottom, #FFF, #FFF8) border-box subtract,
+                linear-gradient(to bottom, #FFFA, #FFFE) padding-box;
+            pointer-events: none;
+        }
+    }
+
+    &.auto-shine
+    {
+        &::before { animation: linear-shine 3.5s linear infinite }
     }
 }
 
