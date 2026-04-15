@@ -180,6 +180,8 @@ export function phpFileFrom(structure: DatabaseStructure): string
                 php += `, `;
 
             php += `\``;
+            php += tableName;
+            php += `\`.\``;
             php += columnName;
             php += `\``;
         }
@@ -339,6 +341,8 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += `, `;
 
                         php += `\``;
+                        php += tableName;
+                        php += `\`.\``;
                         php += columnName;
                         php += `\``;
                     }
@@ -356,6 +360,8 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += ` AND `;
 
                         php += `\``;
+                        php += tableName;
+                        php += `\`.\``;
                         php += columnName;
                         php += `\` = ?`;
                     }
@@ -526,6 +532,8 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += `, `;
 
                         php += `\``;
+                        php += tableName;
+                        php += `\`.\``;
                         php += columnName;
                         php += `\``;
                     }
@@ -543,6 +551,8 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += ` AND `;
 
                         php += `\``;
+                        php += tableName;
+                        php += `\`.\``;
                         php += columnName;
                         php += `\` = ?`;
                     }

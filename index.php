@@ -4,6 +4,8 @@
     require_once __DIR__."/include/api/search.php";
 
     $media = api_random_media();
+
+    $account = api_account_info();
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -16,7 +18,9 @@
   <nav<?php require __DIR__."/part/navigation_bar.php" ?>/nav>
   <main
     style="
-      margin: 16px;
+      margin: 16px auto;
+      padding-inline: 16px;
+      max-width: 1280px;
       display: flex;
       flex-flow: row wrap;
       justify-content: center;
@@ -33,7 +37,7 @@
                 style="width: 140px">
                 <img
                   src="./img/<?php echo $entry["id"] ?>.jpg"
-                  style="width: 100%; aspect-ratio: 2/3;">
+                  style="width: 100%; aspect-ratio: 2/3">
                 <div style="margin: 4px 8px 4px;">
                   <h3
                     style="margin: 0; font-size: medium">

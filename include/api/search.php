@@ -34,7 +34,11 @@
 
     /**
      * Public API
-     * @return ?array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}
+     * @return ?array{
+     *     media: array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime},
+     *     cast: array{id: int, full_name: string, description: string}[],
+     *     directors: array{id: int, full_name: string, description: string}[],
+     *     writers: array{id: int, full_name: string, description: string}[]}
      * @throws api_error
      */
     function api_media_info(): ?array
@@ -46,7 +50,37 @@
 
         $connection = new database_access();
 
-        try { return $connection->select_media_with_id($posted_id); }
+        try
+        {
+            /*
+             * Since the database is local the delay is minimal though this
+             * solution is horrible either way.
+             */
+
+            $cast_job = $connection->select_person_in_media_job_with_name("cast")["id"];
+            $director_job = $connection->select_person_in_media_job_with_name("director")["id"];
+            $writer_job = $connection->select_person_in_media_job_with_name("writer")["id"];
+
+            return
+            [
+                "media" => $connection->select_media_with_id($posted_id),
+                "cast" => $connection->select_people(
+                    "INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = ?",
+                    "ii",
+                    $posted_id,
+                    $cast_job),
+                "directors" => $connection->select_people(
+                    "INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = ?",
+                    "ii",
+                    $posted_id,
+                    $director_job),
+                "writers" => $connection->select_people(
+                    "INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = ?",
+                    "ii",
+                    $posted_id,
+                    $writer_job),
+            ];
+        }
         finally { $connection->close(); }
     }
 

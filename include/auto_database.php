@@ -57,7 +57,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `image_id`, `image_description` FROM `images` ".$rawCondition);
+                "SELECT `images`.`image_id`, `images`.`image_description` FROM `images` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -94,7 +94,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `image_id`, `image_description` FROM `images` WHERE `image_id` = ?");
+                "SELECT `images`.`image_id`, `images`.`image_description` FROM `images` WHERE `images`.`image_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -158,7 +158,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` ".$rawCondition);
+                "SELECT `accounts`.`account_id`, `accounts`.`account_username`, `accounts`.`account_email`, `accounts`.`account_password_hash` FROM `accounts` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -199,7 +199,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` WHERE `account_id` = ?");
+                "SELECT `accounts`.`account_id`, `accounts`.`account_username`, `accounts`.`account_email`, `accounts`.`account_password_hash` FROM `accounts` WHERE `accounts`.`account_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -236,7 +236,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `account_username`, `account_email`, `account_password_hash` FROM `accounts` WHERE `account_email` = ?");
+                "SELECT `accounts`.`account_id`, `accounts`.`account_username`, `accounts`.`account_email`, `accounts`.`account_password_hash` FROM `accounts` WHERE `accounts`.`account_email` = ?");
 
             $stmt->bind_param(
                 "s",
@@ -305,7 +305,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id`, `media_release_date` FROM `media` ".$rawCondition);
+                "SELECT `media`.`media_id`, `media`.`media_title`, `media`.`media_description`, `media`.`media_cover_image_id`, `media`.`media_release_date` FROM `media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -348,7 +348,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `media_title`, `media_description`, `media_cover_image_id`, `media_release_date` FROM `media` WHERE `media_id` = ?");
+                "SELECT `media`.`media_id`, `media`.`media_title`, `media`.`media_description`, `media`.`media_cover_image_id`, `media`.`media_release_date` FROM `media` WHERE `media`.`media_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -417,7 +417,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `person_full_name`, `person_description` FROM `people` ".$rawCondition);
+                "SELECT `people`.`person_id`, `people`.`person_full_name`, `people`.`person_description` FROM `people` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -456,7 +456,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `person_full_name`, `person_description` FROM `people` WHERE `person_id` = ?");
+                "SELECT `people`.`person_id`, `people`.`person_full_name`, `people`.`person_description` FROM `people` WHERE `people`.`person_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -521,7 +521,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `media_id`, `rating_rating` FROM `ratings` ".$rawCondition);
+                "SELECT `ratings`.`account_id`, `ratings`.`media_id`, `ratings`.`rating_rating` FROM `ratings` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -561,7 +561,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `media_id`, `rating_rating` FROM `ratings` WHERE `account_id` = ? AND `media_id` = ?");
+                "SELECT `ratings`.`account_id`, `ratings`.`media_id`, `ratings`.`rating_rating` FROM `ratings` WHERE `ratings`.`account_id` = ? AND `ratings`.`media_id` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -626,7 +626,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `movie_length_minutes` FROM `movies` ".$rawCondition);
+                "SELECT `movies`.`media_id`, `movies`.`movie_length_minutes` FROM `movies` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -663,7 +663,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `movie_length_minutes` FROM `movies` WHERE `media_id` = ?");
+                "SELECT `movies`.`media_id`, `movies`.`movie_length_minutes` FROM `movies` WHERE `movies`.`media_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -725,7 +725,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `genre` FROM `genre_of_media` ".$rawCondition);
+                "SELECT `genre_of_media`.`media_id`, `genre_of_media`.`genre` FROM `genre_of_media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -763,7 +763,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `media_id`, `genre` FROM `genre_of_media` WHERE `media_id` = ? AND `genre` = ?");
+                "SELECT `genre_of_media`.`media_id`, `genre_of_media`.`genre` FROM `genre_of_media` WHERE `genre_of_media`.`media_id` = ? AND `genre_of_media`.`genre` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -826,7 +826,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genre_id`, `genre` FROM `genres` ".$rawCondition);
+                "SELECT `genres`.`genre_id`, `genres`.`genre` FROM `genres` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -863,7 +863,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genre_id`, `genre` FROM `genres` WHERE `genre_id` = ?");
+                "SELECT `genres`.`genre_id`, `genres`.`genre` FROM `genres` WHERE `genres`.`genre_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -896,7 +896,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genre_id`, `genre` FROM `genres` WHERE `genre` = ?");
+                "SELECT `genres`.`genre_id`, `genres`.`genre` FROM `genres` WHERE `genres`.`genre` = ?");
 
             $stmt->bind_param(
                 "s",
@@ -959,7 +959,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` ".$rawCondition);
+                "SELECT `people_in_media`.`person_id`, `people_in_media`.`media_id`, `people_in_media`.`person_in_media_job` FROM `people_in_media` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -1000,7 +1000,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` WHERE `person_id` = ? AND `media_id` = ? AND `person_in_media_job` = ?");
+                "SELECT `people_in_media`.`person_id`, `people_in_media`.`media_id`, `people_in_media`.`person_in_media_job` FROM `people_in_media` WHERE `people_in_media`.`person_id` = ? AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = ?");
 
             $stmt->bind_param(
                 "iii",
@@ -1038,7 +1038,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_id`, `media_id`, `person_in_media_job` FROM `people_in_media` WHERE `media_id` = ? AND `person_in_media_job` = ?");
+                "SELECT `people_in_media`.`person_id`, `people_in_media`.`media_id`, `people_in_media`.`person_in_media_job` FROM `people_in_media` WHERE `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = ?");
 
             $stmt->bind_param(
                 "ii",
@@ -1108,7 +1108,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` ".$rawCondition);
+                "SELECT `person_in_media_jobs`.`person_in_media_job_id`, `person_in_media_jobs`.`person_in_media_job` FROM `person_in_media_jobs` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -1145,7 +1145,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_job_id` = ?");
+                "SELECT `person_in_media_jobs`.`person_in_media_job_id`, `person_in_media_jobs`.`person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_jobs`.`person_in_media_job_id` = ?");
 
             $stmt->bind_param(
                 "i",
@@ -1178,7 +1178,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `person_in_media_job_id`, `person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_job` = ?");
+                "SELECT `person_in_media_jobs`.`person_in_media_job_id`, `person_in_media_jobs`.`person_in_media_job` FROM `person_in_media_jobs` WHERE `person_in_media_jobs`.`person_in_media_job` = ?");
 
             $stmt->bind_param(
                 "s",
@@ -1241,7 +1241,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `media_id`, `review_content` FROM `reviews` ".$rawCondition);
+                "SELECT `reviews`.`account_id`, `reviews`.`media_id`, `reviews`.`review_content` FROM `reviews` ".$rawCondition);
 
             if (is_string($bind_params[0]))
                 $stmt->bind_param(...$bind_params);
@@ -1281,7 +1281,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `account_id`, `media_id`, `review_content` FROM `reviews` WHERE `account_id` = ? AND `media_id` = ?");
+                "SELECT `reviews`.`account_id`, `reviews`.`media_id`, `reviews`.`review_content` FROM `reviews` WHERE `reviews`.`account_id` = ? AND `reviews`.`media_id` = ?");
 
             $stmt->bind_param(
                 "ii",
