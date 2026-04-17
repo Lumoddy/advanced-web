@@ -178,6 +178,16 @@ export function parsePrefixPHPType(phpType: string | Iterable<PHPTypeLexerToken>
 
                 ({type, value} = next.value);
             }
+            else if (value === "DateTime")
+            {
+                current = "true";
+
+                next = iterator.next();
+                if (next.done)
+                    return finalize(result.add(current));
+
+                ({type, value} = next.value);
+            }
             else if (value === "array")
             {
                 current = "object";

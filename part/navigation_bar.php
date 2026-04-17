@@ -39,7 +39,7 @@
     <input
       id="search-text"
       style="
-        min-width: none;
+        min-width: 0;
         max-width: none;
         margin-right: 0;
         border-top-right-radius: 0;

@@ -165,7 +165,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
         function select_`;
 
         php += table.snakePlural;
-        php += `(string $rawCondition, ...$bind_params): array
+        php += `(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,

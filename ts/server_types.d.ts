@@ -19,18 +19,18 @@ export type ServerJSONShapeMap =
         | { "is_logged_in": true, "id": number, "username": string, "email": string }
         | { "error": ServerErrorMap[`/json/login.php`], "message": string },
     [`/json/search_media.php`]:
-        | unknown
+        | { "id": number, "title": string, "description": string, "cover_image_id": number, "release_date": true }[]
         | { "error": ServerErrorMap[`/json/search_media.php`], "message": string },
     [`/json/account_info.php`]:
         | { "is_logged_in": true, "id": number, "username": string, "email": string } | { "is_logged_in": false, "id": null, "username": null, "email": null }
         | { "error": ServerErrorMap[`/json/account_info.php`], "message": string },
     [`/json/media_info.php`]:
-        | unknown
+        | null | { "media": { "id": number, "title": string, "description": string, "cover_image_id": number, "release_date": true }, "genres": { "id": number, "name": string }[], "cast": { "id": number, "full_name": string, "description": string }[], "directors": { "id": number, "full_name": string, "description": string }[], "writers": { "id": number, "full_name": string, "description": string }[] }
         | { "error": ServerErrorMap[`/json/media_info.php`], "message": string },
     [`/json/logout.php`]:
         | { "is_logged_in": false, "was_logged_in": boolean }
         | { "error": ServerErrorMap[`/json/logout.php`], "message": string },
     [`/json/random_media.php`]:
-        | unknown
+        | { "id": number, "title": string, "description": string, "cover_image_id": number, "release_date": true }[]
         | { "error": ServerErrorMap[`/json/random_media.php`], "message": string },
 };

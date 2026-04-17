@@ -53,7 +53,7 @@
          * @return array{id: int, description: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_images(string $rawCondition, ...$bind_params): array
+        function select_images(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -154,7 +154,7 @@
          * @return array{id: int, username: string, email: string, password_hash: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_accounts(string $rawCondition, ...$bind_params): array
+        function select_accounts(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -301,7 +301,7 @@
          * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
          * @throws mysqli_sql_exception
          */
-        function select_media(string $rawCondition, ...$bind_params): array
+        function select_media(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -413,7 +413,7 @@
          * @return array{id: int, full_name: string, description: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_people(string $rawCondition, ...$bind_params): array
+        function select_people(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -517,7 +517,7 @@
          * @return array{account_id: int, media_id: int, rating: int}[]
          * @throws mysqli_sql_exception
          */
-        function select_ratings(string $rawCondition, ...$bind_params): array
+        function select_ratings(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -622,7 +622,7 @@
          * @return array{id: int, minutes: int}[]
          * @throws mysqli_sql_exception
          */
-        function select_movies(string $rawCondition, ...$bind_params): array
+        function select_movies(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -721,7 +721,7 @@
          * @return array{media_id: int, genre: int}[]
          * @throws mysqli_sql_exception
          */
-        function select_genre_of_media(string $rawCondition, ...$bind_params): array
+        function select_genre_of_media(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -822,7 +822,7 @@
          * @return array{id: int, name: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_genres(string $rawCondition, ...$bind_params): array
+        function select_genres(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -955,7 +955,7 @@
          * @return array{person_id: int, media_id: int, job: int}[]
          * @throws mysqli_sql_exception
          */
-        function select_people_in_media(string $rawCondition, ...$bind_params): array
+        function select_people_in_media(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -1104,7 +1104,7 @@
          * @return array{id: int, name: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_person_in_media_jobs(string $rawCondition, ...$bind_params): array
+        function select_person_in_media_jobs(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
@@ -1237,7 +1237,7 @@
          * @return array{account_id: int, media_id: int, content: string}[]
          * @throws mysqli_sql_exception
          */
-        function select_reviews(string $rawCondition, ...$bind_params): array
+        function select_reviews(string $rawCondition = "", ...$bind_params): array
         {
             $stmt = new mysqli_stmt(
                 $this->connection,

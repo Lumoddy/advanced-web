@@ -40,6 +40,44 @@
       <section class="glass panel" style="flex: 1; margin: 16px">
         <h1><?php echo $media["media"]["title"] ?></h1>
         <p><?php echo $media["media"]["description"] ?></p>
+        <h3>Genres</h3>
+        <p>
+          <?php
+            $first = true;
+            foreach ($media["genres"] as $genre)
+            {
+                if ($first)
+                    $first = false;
+                else
+                    echo ", ";
+
+                ?><a href="./search.php?for=movies&<?php echo $genre["name"] ?>=on"><?php
+                    switch ($genre["name"])
+                    {
+                        case "action": echo "Action"; break;
+                        case "adventure": echo "Adventure"; break;
+                        case "animation": echo "Animation"; break;
+                        case "biography": echo "Biography"; break;
+                        case "comedy": echo "Comedy"; break;
+                        case "crime": echo "Crime"; break;
+                        case "documentary": echo "Documentary"; break;
+                        case "drama": echo "Drama"; break;
+                        case "family": echo "Family"; break;
+                        case "fantasy": echo "Fantasy"; break;
+                        case "history": echo "History"; break;
+                        case "horror": echo "Horror"; break;
+                        case "music": echo "Music"; break;
+                        case "mystery": echo "Mystery"; break;
+                        case "romance": echo "Romance"; break;
+                        case "sci-fi": echo "Sci-Fi"; break;
+                        case "sport": echo "Sport"; break;
+                        case "thriller": echo "Thriller"; break;
+                        case "war": echo "War"; break;
+                    }
+                ?></a><?php
+            }
+          ?>
+        </p>
         <h3>Writers</h3>
         <p>
           <?php
