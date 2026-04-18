@@ -129,7 +129,7 @@ img
     }
 }
 
-.input, input[type="text"], input[type="email"], input[type="password"], input[type="search"]
+.input, input[type="text"], textarea, input[type="email"], input[type="password"], input[type="search"]
 {
     margin: 6px 4px 2px;
     padding: 4px;
@@ -149,6 +149,20 @@ img
     {
         border-color: #CCCCCC;
     }
+}
+
+text-area
+{
+    display: flex;
+    flex-flow: column nowrap;
+    justify-content: start;
+    align-items: stretch;
+}
+
+textarea
+{
+    border-bottom-right-radius: 0;
+    resize: vertical;
 }
 
 .button, input[type="button"], input[type="submit"], button
@@ -198,7 +212,7 @@ img
         }
     }
 
-    .glass:is(input[type="text"], input[type="email"], input[type="password"], input[type="search"])
+    .glass:is(input[type="text"], textarea, input[type="email"], input[type="password"], input[type="search"])
     {
         border-color: #AAAAAA66;
         background: linear-gradient(to bottom, #AAAAAA66, #AAAAAA44);
@@ -237,7 +251,7 @@ img
 
 @media not (prefers-reduced-motion), all
 {
-    .input, input[type="text"], input[type="email"], input[type="password"], input[type="search"],
+    .input, input[type="text"], textarea, input[type="email"], input[type="password"], input[type="search"],
     .button, input[type="button"], input[type="submit"], button
     {
         transition:
@@ -253,6 +267,108 @@ img
                 padding-inline ease-out 0.1s;
         }
     }
+}
+
+rating-selector
+{
+    margin: 6px 4px 2px;
+    display: flex;
+    position: relative;
+    flex-flow: row nowrap;
+    justify-content: start;
+    align-items: start;
+    align-content: start;
+
+    & > input
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        appearance: none;
+        outline: none;
+    }
+
+    & > label
+    {
+        width: 32px;
+        height: 32px;
+        position: relative;
+
+        & > .off, & > .on
+        {
+            position: absolute;
+            inset: 0;
+        }
+
+        & > .off { display: block }
+        & > .on { display: none }
+
+        @media not (prefers-reduced-motion), all
+        {
+            translate: 0 0;
+            transition:
+                translate ease-out 0.2s;
+
+            &:hover, &:focus-visible
+            {
+                translate: 0 -4px;
+                transition:
+                    translate ease-out 0.1s;
+            }
+        }
+    }
+
+    & > input:is(:hover, :focus-visible) + label
+    {
+        outline: auto;
+    }
+
+    & > label:has(~ input:checked), & > input:checked + label
+    {
+        & > .off { display: none }
+        & > .on { display: block }
+    }
+}
+
+rating-display
+{
+    margin: 6px 4px 2px;
+    display: inline-flex;
+    flex-flow: row nowrap;
+    justify-content: start;
+    align-items: start;
+    align-content: start;
+
+    & > svg
+    {
+        width: 32px;
+        height: 32px;
+    }
+}
+
+rating-display.small
+{
+    & > svg
+    {
+        width: 28px;
+        height: 28px;
+    }
+}
+
+rating-display.large
+{
+    & > svg
+    {
+        width: 48px;
+        height: 48px;
+    }
+}
+
+.error
+{
+    color: #FF6464;
 }
 
 .variant-slide

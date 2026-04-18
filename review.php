@@ -11,7 +11,31 @@
         exit;
     }
 
+    $posted_rating = posted_param_int("rating");
+    $posted_review = posted_param("review");
+
+    if ($_SERVER["REQUEST_METHOD"] === "POST")
+    {
+        try
+        {
+            api_post_review();
+
+            header("Location: ./media.php?id=".$media["media"]["id"]);
+            exit;
+        }
+        catch (api_error $e)
+        {
+            $error = $e->getMessage();
+        }
+    }
+
     $account = api_account_info();
+
+    if (!$account["is_logged_in"])
+    {
+        header("Location: ./media.php?id=".$media["media"]["id"]);
+        exit;
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
@@ -176,75 +200,68 @@
         </p>
       </section class="glass panel">
     </div>
-    <div
-      style="
-        margin: 16px;
-        display: flex;
-        flex-flow: row nowrap;
-        justify-content: space-between;
-        align-items: center">
-      <h2>Reviews</h2>
-      <a class="glass button" href="<?php
-          if ($account["is_logged_in"])
-          {
-              ?>./review.php?id=<?php echo $media["media"]["id"] ?><?php
-          }
-          else
-          {
-              ?>./login.php?r=.%2Freview.php%3Fid%3D<?php echo $media["media"]["id"] ?><?php
-          }
-      ?>">Make Review</a>
-    </div>
-    <?php
-        foreach ($media["reviews"] as $review)
-        {
-            ?>
-              <section class="glass panel">
-                <div
-                  style="
-                    display: flex;
-                    flex-flow: row nowrap;
-                    justify-content: space-between;
-                    align-items: start">
-                  <h3 style="margin: 4px; font-size: larger; font-weight: normal">
-                    <span style="font-weight: bold">
-                      <?php echo $review["account_username"] ?>
-                    </span>
-                    says:
-                  </h3>
-                  <rating-display>
-                    <svg<?php
-                        require $review["rating"] >= 1
-                            ? __DIR__."/part/star_filled_icon.php"
-                            : __DIR__."/part/star_icon.php";
-                    ?>svg>
-                    <svg<?php
-                        require $review["rating"] >= 2
-                            ? __DIR__."/part/star_filled_icon.php"
-                            : __DIR__."/part/star_icon.php";
-                    ?>svg>
-                    <svg<?php
-                        require $review["rating"] >= 3
-                            ? __DIR__."/part/star_filled_icon.php"
-                            : __DIR__."/part/star_icon.php";
-                    ?>svg>
-                    <svg<?php
-                        require $review["rating"] >= 4
-                            ? __DIR__."/part/star_filled_icon.php"
-                            : __DIR__."/part/star_icon.php";
-                    ?>svg>
-                    <svg<?php
-                        require $review["rating"] >= 5
-                            ? __DIR__."/part/star_filled_icon.php"
-                            : __DIR__."/part/star_icon.php";
-                    ?>svg>
-                  </rating-display>
-                </div>
-                <p style="margin: 4px; font-size: large"><?php echo $review["review"] ?></p>
-              </section class="glass panel">
+    <section class="panel glass manual-shine" id="make-review">
+      <form method="post">
+        <h2 id="write">Write Review</h2>
+        <text-area>
+          <textarea
+            class="glass"
+            name="review"
+            style="
+              display: block;
+              max-width: none"
+            placeholder="Leave blank to post only the rating..."></textarea>
+        </text-area>
+        <div
+          style="
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: space-between;
+            align-items: stretch">
+          <rating-selector>
+            <input id="rating-star-1" type="radio" name="rating" value="1">
+            <label for="rating-star-1">
+              <svg class="off" <?php require __DIR__."/part/star_icon.php" ?>svg>
+              <svg class="on" <?php require __DIR__."/part/star_filled_icon.php" ?>svg>
+            </label>
+            <input id="rating-star-2" type="radio" name="rating" value="2">
+            <label for="rating-star-2">
+              <svg class="off" <?php require __DIR__."/part/star_icon.php" ?>svg>
+              <svg class="on" <?php require __DIR__."/part/star_filled_icon.php" ?>svg>
+            </label>
+            <input id="rating-star-3" type="radio" name="rating" value="3">
+            <label for="rating-star-3">
+              <svg class="off" <?php require __DIR__."/part/star_icon.php" ?>svg>
+              <svg class="on" <?php require __DIR__."/part/star_filled_icon.php" ?>svg>
+            </label>
+            <input id="rating-star-4" type="radio" name="rating" value="4">
+            <label for="rating-star-4">
+              <svg class="off" <?php require __DIR__."/part/star_icon.php" ?>svg>
+              <svg class="on" <?php require __DIR__."/part/star_filled_icon.php" ?>svg>
+            </label>
+            <input id="rating-star-5" type="radio" name="rating" value="5">
+            <label for="rating-star-5">
+              <svg class="off" <?php require __DIR__."/part/star_icon.php" ?>svg>
+              <svg class="on" <?php require __DIR__."/part/star_filled_icon.php" ?>svg>
+            </label>
+          </rating-selector>
+          <div
+            style="
+              display: flex;
+              flex-flow: row nowrap;
+              justify-content: start;
+              align-items: stretch">
             <?php
-        }
-    ?>
+                if (isset($error))
+                {
+                    ?><p class="error"><?php echo $error ?></p><?php
+                }
+            ?>
+            <button class="glass" type="submit">Post</button>
+          </div>
+        </div>
+      </form>
+    </section>
   </main>
 </body>
 </html>

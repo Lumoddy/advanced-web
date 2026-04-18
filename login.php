@@ -11,12 +11,7 @@
         ?? $posted_email
         ?? $posted_username;
 
-    if ($posted_if_new
-        ? !is_null($posted_email)
-            || !is_null($posted_password)
-            || !is_null($posted_username)
-        : !is_null($posted_identifier)
-            || !is_null($posted_password))
+    if ($_SERVER["REQUEST_METHOD"] === "POST")
     {
         try
         {
@@ -63,9 +58,7 @@
             <?php
                 if (!is_null($posted_email))
                 {
-                    ?>value="<?php
-                    echo $posted_email
-                    ?>"<?php
+                    ?>value="<?php echo $posted_email ?>"<?php
                 }
             ?>>
         </p>
@@ -82,9 +75,7 @@
             <?php
                 if (!is_null($posted_username))
                 {
-                    ?>value="<?php
-                    echo $posted_username
-                    ?>"<?php
+                    ?>value="<?php echo $posted_username ?>"<?php
                 }
             ?>>
         </p>
@@ -114,9 +105,7 @@
         <?php
             if ($posted_if_new && isset($error))
             {
-                ?><p class="error"><?php
-                echo $error;
-                ?></p><?php
+                ?><p class="error"><?php echo $error ?></p><?php
             }
         ?>
         <button
@@ -149,9 +138,7 @@
             <?php
                 if (!is_null($posted_identifier))
                 {
-                    ?>value="<?php
-                    echo $posted_identifier
-                    ?>"<?php
+                    ?>value="<?php echo $posted_identifier ?>"<?php
                 }
             ?>>
         </p>
@@ -169,9 +156,7 @@
         <?php
             if (!$posted_if_new && isset($error))
             {
-                ?><p class="error"><?php
-                echo $error;
-                ?></p><?php
+                ?><p class="error"><?php echo $error ?></p><?php
             }
         ?>
         <button
@@ -188,8 +173,7 @@
         href="/login.php?new<?php
             if (!is_null($posted_redirect))
             {
-                ?>&r=<?php
-                echo urlencode($posted_redirect);
+                ?>&r=<?php echo urlencode($posted_redirect) ?><?php
             }
         ?>"
         class="login-variant variant-slide<?php
@@ -206,8 +190,7 @@
         href="/login.php<?php
             if (!is_null($posted_redirect))
             {
-                ?>?r=<?php
-                echo urlencode($posted_redirect);
+                ?>?r=<?php echo urlencode($posted_redirect) ?><?php
             }
         ?>"
         class="create-account-variant variant-slide<?php

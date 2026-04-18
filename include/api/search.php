@@ -24,96 +24,96 @@
 
         $connection = new database_access();
 
-        $genres = $connection->select_genres();
-
-        $no_genres = true;
-        foreach ($genres as $genre)
+        try
         {
-            if (request_param_bool($genre["name"]) === null)
-                continue;
+            $genres = $connection->select_genres();
 
-            $no_genres = false;
-            break;
-        }
-
-        if (!$no_genres)
-        {
             $no_genres = true;
             foreach ($genres as $genre)
             {
-                if (request_param_bool($genre["name"]) === true)
+                if (request_param_bool($genre["name"]) === null)
                     continue;
 
                 $no_genres = false;
                 break;
             }
-        }
 
-        $conditions = [];
-        $order_bys = [];
-        $bind_types = "";
-        $bind = [];
-
-        if (is_string($posted_search_name))
-        {
-            array_push($conditions, "`media`.`media_title` LIKE CONCAT(\"%\", ?, \"%\")");
-            $bind_types .= "s";
-            array_push($bind, $posted_search_name);
-        }
-
-        if (is_int($posted_search_with_person))
-        {
-            if (is_string($posted_search_through))
+            if (!$no_genres)
             {
-                array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job_id` = `people_in_media`.`person_in_media_job` AND `person_in_media_jobs`.`person_in_media_job` = ? WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
-                $bind_types .= "si";
-                array_push($bind, $posted_search_through, $posted_search_with_person);
+                $no_genres = true;
+                foreach ($genres as $genre)
+                {
+                    if (request_param_bool($genre["name"]) === true)
+                        continue;
+
+                    $no_genres = false;
+                    break;
+                }
             }
-            else
+
+            $conditions = [];
+            $order_bys = [];
+            $bind_types = "";
+            $bind = [];
+
+            if (is_string($posted_search_name))
             {
-                array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
-                $bind_types .= "i";
-                array_push($bind, $posted_search_with_person);
+                array_push($conditions, "`media`.`media_title` LIKE CONCAT(\"%\", ?, \"%\")");
+                $bind_types .= "s";
+                array_push($bind, $posted_search_name);
             }
-        }
 
-        if (!$no_genres)
-        {
-            $condition = "EXISTS(SELECT NULL FROM `genre_of_media` WHERE `genre_of_media`.`media_id` = `media`.`media_id` AND `genre_of_media`.`genre` IN (";
-
-            $first = true;
-            foreach ($genres as $genre)
+            if (is_int($posted_search_with_person))
             {
-                if (!(request_param_bool($genre["name"]) ?? false))
-                    continue;
-
-                if ($first)
-                    $first = false;
+                if (is_string($posted_search_through))
+                {
+                    array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job_id` = `people_in_media`.`person_in_media_job` AND `person_in_media_jobs`.`person_in_media_job` = ? WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
+                    $bind_types .= "si";
+                    array_push($bind, $posted_search_through, $posted_search_with_person);
+                }
                 else
-                    $condition .= ", ";
-
-                $condition .= "?";
-                $bind_types .= "i";
-                array_push($bind, $genre["id"]);
+                {
+                    array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
+                    $bind_types .= "i";
+                    array_push($bind, $posted_search_with_person);
+                }
             }
 
-            $condition .= "))";
+            if (!$no_genres)
+            {
+                $condition = "EXISTS(SELECT NULL FROM `genre_of_media` WHERE `genre_of_media`.`media_id` = `media`.`media_id` AND `genre_of_media`.`genre` IN (";
 
-            array_push($conditions, $condition);
-        }
+                $first = true;
+                foreach ($genres as $genre)
+                {
+                    if (!(request_param_bool($genre["name"]) ?? false))
+                        continue;
 
-        if (is_string($posted_search_name))
-        {
-            array_push($order_bys, "LOCATE(?, `media`.`media_title`)");
-            $bind_types .= "s";
-            array_push($bind, $posted_search_name);
-        }
+                    if ($first)
+                        $first = false;
+                    else
+                        $condition .= ", ";
 
-        $bind_types .= "i";
-        array_push($bind, $posted_limit);
+                    $condition .= "?";
+                    $bind_types .= "i";
+                    array_push($bind, $genre["id"]);
+                }
 
-        try
-        {
+                $condition .= "))";
+
+                array_push($conditions, $condition);
+            }
+
+            if (is_string($posted_search_name))
+            {
+                array_push($order_bys, "LOCATE(?, `media`.`media_title`)");
+                $bind_types .= "s";
+                array_push($bind, $posted_search_name);
+            }
+
+            $bind_types .= "i";
+            array_push($bind, $posted_limit);
+
             $sql = "";
 
             $first = true;
@@ -157,44 +157,109 @@
 
     /**
      * Public API
-     * @return ?array{media: array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}, genres: array{id: int, name: string}[], cast: array{id: int, full_name: string, description: string}[], directors: array{id: int, full_name: string, description: string}[], writers: array{id: int, full_name: string, description: string}[]}
+     * @return array{media: array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}, rating_count: int, rating: ?float, genres: array{id: int, name: string}[], cast: array{id: int, full_name: string, description: string}[], directors: array{id: int, full_name: string, description: string}[], writers: array{id: int, full_name: string, description: string}[], reviews: array{account_id: int, account_username: string, rating: int, review: string}[]}
      * @throws api_error
      */
-    function api_media_info(): ?array
+    function api_media_info(): array
     {
         $posted_id = request_param_int("id");
 
-        if ($posted_id === null || $posted_id === false)
-            return null;
+        if (!is_int($posted_id))
+            throw new api_error(
+                "syntax/missing-param",
+                "Missing field 'id'.");
 
         $connection = new database_access();
 
         try
         {
-            /*
-             * Since the database is local the delay is minimal though this
-             * solution is horrible either way.
-             */
+            // I would improve this if it weren't actually intended api.
+            //
+            // PHP has the single worst api for a database I have ever seen.
+            // I hate PHP so much.
+
+            $media = $connection->select_media_with_id($posted_id);
+            $genres = $connection->select_genres(
+                "INNER JOIN `genre_of_media` ON `genre_of_media`.`media_id` = ? AND `genre_of_media`.`genre` = `genres`.`genre_id`",
+                "i",
+                $posted_id);
+            $cast = $connection->select_people(
+                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"cast\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
+                "i",
+                $posted_id);
+            $directors = $connection->select_people(
+                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"director\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
+                "i",
+                $posted_id);
+            $writers = $connection->select_people(
+                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"writer\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
+                "i",
+                $posted_id);
+
+            $stmt = new mysqli_stmt(
+                $connection->connection,
+                "SELECT `accounts`.`account_id`, `accounts`.`account_username`, `ratings`.`rating_rating`, `reviews`.`review_content` FROM `ratings` INNER JOIN `accounts` ON `ratings`.`account_id` = `accounts`.`account_id` INNER JOIN `reviews` ON `ratings`.`account_id` = `reviews`.`account_id` AND `ratings`.`media_id` = `reviews`.`media_id` WHERE `ratings`.`media_id` = ?");
+
+            try
+            {
+                $stmt->bind_param("i", $posted_id);
+
+                $stmt->bind_result(
+                    $result_account_id,
+                    $result_account_username,
+                    $result_rating,
+                    $result_review);
+
+                $stmt->execute();
+
+                $reviews = [];
+
+                while ($stmt->fetch())
+                {
+                    array_push(
+                        $reviews,
+                        [
+                            "account_id" => (int)$result_account_id,
+                            "account_username" => (string)$result_account_username,
+                            "rating" => (int)$result_rating,
+                            "review" => (string)$result_review,
+                        ]);
+                }
+            }
+            finally { $stmt->close(); }
+
+            $stmt = new mysqli_stmt(
+                $connection->connection,
+                "SELECT COUNT(*), AVG(`ratings`.`rating_rating`) FROM `ratings` WHERE `ratings`.`media_id` = ?");
+
+            try
+            {
+                $stmt->bind_param("i", $posted_id);
+
+                $result_rating = 0.0;
+
+                $stmt->bind_result(
+                    $result_rating_count,
+                    $result_rating);
+
+                $stmt->execute();
+                $stmt->fetch();
+
+                $rating_count = (int)$result_rating_count;
+                $rating = $result_rating === null ? null : (float)$result_rating;
+            }
+            finally { $stmt->close(); }
 
             return
             [
-                "media" => $connection->select_media_with_id($posted_id),
-                "genres" => $connection->select_genres(
-                    "INNER JOIN `genre_of_media` WHERE `genre_of_media`.`media_id` = ? AND `genre_of_media`.`genre` = `genres`.`genre_id`",
-                    "i",
-                    $posted_id),
-                "cast" => $connection->select_people(
-                    "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"cast\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                    "i",
-                    $posted_id),
-                "directors" => $connection->select_people(
-                    "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"director\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                    "i",
-                    $posted_id),
-                "writers" => $connection->select_people(
-                    "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"writer\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                    "i",
-                    $posted_id),
+                "media" => $media,
+                "rating_count" => $rating_count,
+                "rating" => $rating,
+                "genres" => $genres,
+                "cast" => $cast,
+                "directors" => $directors,
+                "writers" => $writers,
+                "reviews" => $reviews,
             ];
         }
         finally { $connection->close(); }

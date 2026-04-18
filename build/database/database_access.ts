@@ -11,7 +11,7 @@ export function phpFileFrom(structure: DatabaseStructure): string
 
     class auto_database_access
     {
-        protected mysqli $connection;
+        public readonly mysqli $connection;
 
         public function __construct(mysqli $connection)
         {
@@ -29,34 +29,36 @@ export function phpFileFrom(structure: DatabaseStructure): string
         const columns = table.columns;
         const constraints = table.constraints;
 
-        php += `
+        if (!table.readOnly)
+        {
+            php += `
         /**
          * @param array{`;
 
-        let firstColumn = true;
-        for (const [, column] of columns)
-        {
-            if (firstColumn)
-                firstColumn = false;
-            else
-                php += `, `;
+            let firstColumn = true;
+            for (const [, column] of columns)
+            {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
 
-            php += column.snakeShortenedSingle;
-            php += `: `;
+                php += column.snakeShortenedSingle;
+                php += `: `;
 
-            if (column.nullable)
-                php += `?`;
+                if (column.nullable)
+                    php += `?`;
 
-            php += column.phpType;
-        }
+                php += column.phpType;
+            }
 
-        php += `} ...$rows
+            php += `} ...$rows
          * @throws mysqli_sql_exception
          */
         function insert_`;
 
-        php += table.snakePlural;
-        php += `(array ...$rows): void
+            php += table.snakePlural;
+            php += `(array ...$rows): void
         {
             $count = count($rows);
 
@@ -67,82 +69,88 @@ export function phpFileFrom(structure: DatabaseStructure): string
                 $this->connection,
                 "INSERT INTO \``;
 
-        php += tableName;
-        php += `\` (`;
+            php += tableName;
+            php += `\` (`;
 
-        firstColumn = true;
-        for (const [columnName, ] of columns)
-        {
-            if (firstColumn)
-                firstColumn = false;
-            else
-                php += `, `;
-
-            php += `\``;
-            php += columnName;
-            php += `\``;
-        }
-
-        php += `) VALUES (`;
-
-        firstColumn = true;
-        for (const [] of columns)
-        {
-            if (firstColumn)
-                firstColumn = false;
-            else
-                php += `, `;
-
-            php += `?`;
-        }
-
-        php += `)".str_repeat(", (`;
-
-        firstColumn = true;
-        for (const _ of columns)
-        {
-            if (firstColumn)
-                firstColumn = false;
-            else
-                php += `, `;
-
-            php += `?`;
-        }
-
-        php += `)", $count - 1));
-
-            $params = [];
-
-            foreach ($rows as $row)
+            firstColumn = true;
+            for (const [columnName, ] of columns)
             {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                php += `\``;
+                php += columnName;
+                php += `\``;
+            }
+
+            php += `) VALUES (`;
+
+            firstColumn = true;
+            for (const [] of columns)
+            {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                php += `?`;
+            }
+
+            php += `)".str_repeat(", (`;
+
+            firstColumn = true;
+            for (const _ of columns)
+            {
+                if (firstColumn)
+                    firstColumn = false;
+                else
+                    php += `, `;
+
+                php += `?`;
+            }
+
+            php += `)", $count - 1));
+
+            try
+            {
+                $params = [];
+
+                foreach ($rows as $row)
+                {
 `;
 
-        for (const [, column] of columns)
-        {
-            php += `                array_push($params, `;
-            php += column.phpToSQL.replaceAll("$0", `$row["${column.snakeShortenedSingle}"]`);
-            php += `);
+            for (const [, column] of columns)
+            {
+                php += `                    array_push($params, `;
+                php += column.phpToSQL.replaceAll("$0", `$row["${column.snakeShortenedSingle}"]`);
+                php += `);
+`;
+            }
+
+            php += `                }
+
+                $stmt->bind_param(str_repeat("`;
+
+            for (const [, column] of columns)
+                php += column.phpSqlType;
+
+            php += `", $count), ...$params);
+                $stmt->execute();
+            }
+            finally { $stmt->close(); }
+        }
 `;
         }
 
-        php += `            }
-
-            $stmt->bind_param(str_repeat("`;
-
-        for (const [, column] of columns)
-            php += column.phpSqlType;
-
-        php += `", $count), ...$params);
-            $stmt->execute();
-            $stmt->close();
-        }
-
+        php += `
         /**
          * @param string $rawCondition
          * @param mixed ...$bind_params
          * @return array{`;
 
-        firstColumn = true;
+        let firstColumn = true;
         for (const [, column] of columns)
         {
             if (firstColumn)
@@ -190,10 +198,12 @@ export function phpFileFrom(structure: DatabaseStructure): string
         php += tableName;
         php += `\` ".$rawCondition);
 
-            if (is_string($bind_params[0]))
-                $stmt->bind_param(...$bind_params);
+            try
+            {
+                if (is_string($bind_params[0]))
+                    $stmt->bind_param(...$bind_params);
 
-            $stmt->bind_result(
+                $stmt->bind_result(
 `;
 
         firstColumn = true;
@@ -205,26 +215,26 @@ export function phpFileFrom(structure: DatabaseStructure): string
                 php += `,
 `;
 
-            php += `                $result_`;
+            php += `                    $result_`;
             php += column.snakeShortenedSingle;
         }
 
         php += `);
 
-            $stmt->execute();
+                $stmt->execute();
 
-            $results = [];
+                $results = [];
 
-            while ($stmt->fetch())
-            {
-                array_push(
-                    $results,
-                    [
+                while ($stmt->fetch())
+                {
+                    array_push(
+                        $results,
+                        [
 `;
 
         for (const [columnName, column] of columns)
         {
-            php += `                        "`;
+            php += `                            "`;
             php += column.snakeShortenedSingle;
             php += `" => `;
             php += column.phpFromSQL.replaceAll("$0", `$result_${column.snakeShortenedSingle}`);
@@ -232,12 +242,12 @@ export function phpFileFrom(structure: DatabaseStructure): string
 `;
         }
 
-        php += `                    ]);
+        php += `                        ]);
+                }
+
+                return $results;
             }
-
-            $stmt->close();
-
-            return $results;
+            finally { $stmt->close(); }
         }
 `;
 
@@ -368,8 +378,10 @@ export function phpFileFrom(structure: DatabaseStructure): string
 
                     php += `");
 
-            $stmt->bind_param(
-                "`;
+            try
+            {
+                $stmt->bind_param(
+                    "`;
 
                     for (const [, column] of constraint.columns)
                         php += column.phpSqlType;
@@ -386,13 +398,13 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += `,
 `;
 
-                        php += `                $`;
+                        php += `                    $`;
                         php += column.snakeShortenedSingle;
                     }
 
                     php += `);
 
-            $stmt->bind_result(
+                $stmt->bind_result(
 `;
 
                     firstColumn = true;
@@ -404,21 +416,21 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += `,
 `;
 
-                        php += `                $result_`;
+                        php += `                    $result_`;
                         php += column.snakeShortenedSingle;
                     }
 
                     php += `);
 
-            $stmt->execute();
+                $stmt->execute();
 
-            $result = $stmt->fetch()
-                ? [
+                $result = $stmt->fetch()
+                    ? [
 `;
 
                     for (const [columnName, column] of table.columns)
                     {
-                        php += `                    "`;
+                        php += `                        "`;
                         php += column.snakeShortenedSingle;
                         php += `" => `;
                         php += column.phpFromSQL.replaceAll("$0", `$result_${column.snakeShortenedSingle}`);
@@ -426,12 +438,12 @@ export function phpFileFrom(structure: DatabaseStructure): string
 `;
                     }
 
-                    php += `                ]
-                : null;
+                    php += `                    ]
+                    : null;
 
-            $stmt->close();
-
-            return $result;
+                return $result;
+            }
+            finally { $stmt->close(); }
         }
 `;
 
@@ -559,8 +571,10 @@ export function phpFileFrom(structure: DatabaseStructure): string
 
                     php += `");
 
-            $stmt->bind_param(
-                "`;
+            try
+            {
+                $stmt->bind_param(
+                    "`;
 
                     for (const [, column] of constraint.columns)
                         php += column.phpSqlType;
@@ -577,13 +591,13 @@ export function phpFileFrom(structure: DatabaseStructure): string
                             php += `,
 `;
 
-                        php += `                $`;
+                        php += `                    $`;
                         php += column.snakeShortenedSingle;
                     }
 
                     php += `);
 
-            $stmt->bind_result(
+                $stmt->bind_result(
 `;
 
         firstColumn = true;
@@ -595,26 +609,26 @@ export function phpFileFrom(structure: DatabaseStructure): string
                 php += `,
 `;
 
-            php += `                $result_`;
+            php += `                    $result_`;
             php += column.snakeShortenedSingle;
         }
 
         php += `);
 
-            $stmt->execute();
+                $stmt->execute();
 
-            $results = [];
+                $results = [];
 
-            while ($stmt->fetch())
-            {
-                array_push(
-                    $results,
-                    [
+                while ($stmt->fetch())
+                {
+                    array_push(
+                        $results,
+                        [
 `;
 
         for (const [columnName, column] of columns)
         {
-            php += `                        "`;
+            php += `                            "`;
             php += columnName;
             php += `" => `;
             php += column.phpFromSQL.replaceAll("$0", `$result_${column.snakeShortenedSingle}`);
@@ -622,16 +636,271 @@ export function phpFileFrom(structure: DatabaseStructure): string
 `;
         }
 
-        php += `                    ]);
+        php += `                        ]);
+                }
+
+                return $results;
             }
-
-            $stmt->close();
-
-            return $results;
+            finally { $stmt->close(); }
         }
 `;
 
                     break;
+                }
+            }
+        }
+
+        if (!table.readOnly)
+        {
+            for (const constraint of constraints)
+            {
+                switch (constraint.type)
+                {
+                    case "primary":
+                    case "unique":
+                    {
+
+                php += `
+        /**
+`;
+
+                        for (const [, column] of constraint.columns)
+                        {
+                            php += `         * @param `;
+
+                            if (column.nullable)
+                                php += `?`;
+
+                            php += column.phpType;
+                            php += ` $`;
+                            php += column.snakeShortenedSingle;
+                            php += `
+`;
+                        }
+
+                        php += `         * @return bool \`true\` if something was deleted.
+         * @throws mysqli_sql_exception
+         */
+        function delete_`;
+
+                        php += table.snakeSingle;
+                        php += `_with`;
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            php += `_`;
+
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `and_`;
+
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `(`
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `, `;
+
+                            if (column.nullable)
+                                php += `?`;
+
+                            php += column.phpType;
+
+                            php += ` $`;
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `): bool
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "DELETE FROM \``;
+                        php += tableName;
+                        php += `\` WHERE `;
+
+                        firstColumn = true;
+                        for (const [columnName] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += ` AND `;
+
+                            php += `\``;
+                            php += tableName;
+                            php += `\`.\``;
+                            php += columnName;
+                            php += `\` = ?`;
+                        }
+
+                        php += `");
+
+            try
+            {
+                $stmt->bind_param(
+                    "`;
+
+                        for (const [, column] of constraint.columns)
+                            php += column.phpSqlType;
+
+                        php += `",
+`;
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `,
+`;
+
+                            php += `                    $`;
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `);
+
+                $stmt->execute();
+
+                return $stmt->affected_rows !== 0;
+            }
+            finally { $stmt->close(); }
+        }
+`;
+
+                        break;
+                    }
+                    case "key":
+                    {
+
+                php += `
+        /**
+`;
+
+                        for (const [, column] of constraint.columns)
+                        {
+                            php += `         * @param `;
+
+                            if (column.nullable)
+                                php += `?`;
+
+                            php += column.phpType;
+                            php += ` $`;
+                            php += column.snakeShortenedSingle;
+                            php += `
+`;
+                        }
+
+                        php += `         * @return int The amount of deleted rows.
+         * @throws mysqli_sql_exception
+         */
+        function delete_`;
+
+                        php += table.snakePlural;
+                        php += `_with`;
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            php += `_`;
+
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `and_`;
+
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `(`
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `, `;
+
+                            if (column.nullable)
+                                php += `?`;
+
+                            php += column.phpType;
+
+                            php += ` $`;
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `): bool
+        {
+            $stmt = new mysqli_stmt(
+                $this->connection,
+                "DELETE FROM \``;
+                        php += tableName;
+                        php += `\` WHERE `;
+
+                        firstColumn = true;
+                        for (const [columnName] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += ` AND `;
+
+                            php += `\``;
+                            php += tableName;
+                            php += `\`.\``;
+                            php += columnName;
+                            php += `\` = ?`;
+                        }
+
+                        php += `");
+
+            try
+            {
+                $stmt->bind_param(
+                    "`;
+
+                        for (const [, column] of constraint.columns)
+                            php += column.phpSqlType;
+
+                        php += `",
+`;
+
+                        firstColumn = true;
+                        for (const [, column] of constraint.columns)
+                        {
+                            if (firstColumn)
+                                firstColumn = false;
+                            else
+                                php += `,
+`;
+
+                            php += `                    $`;
+                            php += column.snakeShortenedSingle;
+                        }
+
+                        php += `);
+
+                $stmt->execute();
+
+                return (int)$stmt->affected_rows;
+            }
+            finally { $stmt->close(); }
+        }
+`;
+
+                        break;
+                    }
                 }
             }
         }

@@ -66,13 +66,14 @@
       flex-flow: row nowrap;
       justify-content: center;
       align-items: center;
-      font-size: larger">
+      font-size: x-large;
+      gap: 16px">
     <?php
         if ($account["is_logged_in"])
         {
             ?>
               <span><?php echo $account["username"] ?></span>
-              <a href="./logout.php">Log Out</a>
+              <a href="./logout.php">Logout</a>
             <?php
         }
         else

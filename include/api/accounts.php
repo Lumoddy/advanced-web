@@ -198,4 +198,78 @@
 
         return [ "is_logged_in" => false, "was_logged_in" => $was_logged_in ];
     }
+
+    /**
+     * Public API
+     * @return array{posted: true, replaced: bool}
+     * @throws api_error
+     */
+    function api_post_review(): ?array
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
+
+        $account_id = isset($_SESSION["account_id"]) ? (int)$_SESSION["account_id"] : null;
+
+        if (!is_int($account_id))
+            throw new api_error(
+                "login/not-logged-in",
+                "You must be logged in before posting a review.");
+
+        $posted_id = request_param_int("id");
+
+        if (!is_int($posted_id))
+            throw new api_error(
+                "syntax/missing-param",
+                "Missing field 'id'.");
+
+        $posted_rating = posted_param_int("rating");
+
+        if (!is_int($posted_rating))
+            throw new api_error(
+                "syntax/missing-param",
+                "Missing field 'rating'.");
+        else if ($posted_rating < 1 || $posted_rating > 5)
+            throw new api_error(
+                "review/rating-out-of-range",
+                "Rating must be between 1 and 5.");
+
+        $posted_review = posted_param("review");
+
+        if ($posted_review !== null && strlen($posted_review) === 0)
+            $posted_review = null;
+
+        $connection = new database_access();
+
+        try
+        {
+            $connection->delete_review_with_account_id_and_media_id(
+                $account_id,
+                $posted_id);
+
+            $replaced = $connection->delete_rating_with_account_id_and_media_id(
+                $account_id,
+                $posted_id);
+
+            $connection->insert_ratings(
+            [
+                "account_id" => $account_id,
+                "media_id" => $posted_id,
+                "rating" => $posted_rating,
+            ]);
+
+            if (is_string($posted_review))
+            {
+                $connection->insert_reviews(
+                [
+                    "account_id" => $account_id,
+                    "media_id" => $posted_id,
+                    "content" => $posted_review,
+                ]);
+            }
+
+            return [ "posted" => true, "replaced" => $replaced ];
+        }
+        finally { $connection->close(); }
+    }
 ?>

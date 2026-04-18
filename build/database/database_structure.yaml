@@ -18,6 +18,7 @@ replacements:
 tables:
 
   images:
+    read_only: true
     columns:
       image_id: { PHP Short Single: id, type: ID }
       image_description: { PHP Short Single: description, type: DESCRIPTION }
@@ -38,6 +39,7 @@ tables:
       - account_email
 
   media:
+    read_only: true
     PHP Single: media
     columns:
       media_id: { PHP Short Single: id, type: ID }
@@ -54,6 +56,7 @@ tables:
         - image_id
 
   people:
+    read_only: true
     PHP Single: person
     columns:
       person_id: { PHP Short Single: id, type: ID }
@@ -82,6 +85,7 @@ tables:
         - media_id
 
   movies:
+    read_only: true
     columns:
       media_id: { PHP Short Single: id, type: ID }
       movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
@@ -94,6 +98,7 @@ tables:
         - media_id
 
   genre_of_media:
+    read_only: true
     PHP Single: genre_of_media
     columns:
       media_id: { PHP Short Single: media_id, type: ID }
@@ -112,6 +117,7 @@ tables:
         - genre_id
 
   genres:
+    read_only: true
     columns:
       genre_id: { PHP Short Single: id, type: ENUM }
       genre: { PHP Short Single: name, type: NAME }
@@ -122,6 +128,7 @@ tables:
       - genre
 
   people_in_media:
+    read_only: true
     PHP Single: person_in_media
     columns:
       person_id: { PHP Short Single: person_id, type: ID }
@@ -149,6 +156,7 @@ tables:
         - person_in_media_job_id
 
   person_in_media_jobs:
+    read_only: true
     columns:
       person_in_media_job_id: { PHP Short Single: id, type: ENUM }
       person_in_media_job: { PHP Short Single: name, type: NAME }

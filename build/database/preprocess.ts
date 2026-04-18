@@ -48,6 +48,7 @@ export type DatabaseTable =
     snakeShortenedPlural: string,
     columns: Map<string, DatabaseColumn>,
     constraints: DatabaseConstraint[],
+    readOnly: boolean,
 };
 
 export type DatabaseStructure = { tables: Map<string, DatabaseTable> };
@@ -145,6 +146,7 @@ export function preprocessObject(source: any): DatabaseStructure
 
         const sourceConstraints = sourceTable["constraints"];
         const constraints: DatabaseConstraint[] = [];
+        const readOnly = Boolean(sourceTable["read_only"]);
 
         for (const sourceConstraint of sourceConstraints)
         {
@@ -247,6 +249,7 @@ export function preprocessObject(source: any): DatabaseStructure
                 snakeShortenedSingle,
                 columns,
                 constraints,
+                readOnly,
             });
     }
 
