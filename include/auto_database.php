@@ -1700,7 +1700,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` ".$rawCondition);
+                "WITH `reviews_view` AS (SELECT `accounts`.`account_id` AS `account_id`, `accounts`.`account_username` AS `account_username`, `reviews`.`media_id` AS `media_id`, `rating`.`rating_rating` AS `rating_rating`, `reviews`.`review_content` AS `review_content` FROM `reviews` INNER JOIN `accounts` ON `reviews`.`account_id` = `accounts`.`account_id` INNER JOIN `ratings` AS `rating` ON `reviews`.`account_id` = `rating`.`account_id` AND `reviews`.`media_id` = `rating`.`media_id`)SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` ".$rawCondition);
 
             try
             {
@@ -1746,7 +1746,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` WHERE `reviews_view`.`account_id` = ? AND `reviews_view`.`media_id` = ?");
+                "WITH `reviews_view` AS (SELECT `accounts`.`account_id` AS `account_id`, `accounts`.`account_username` AS `account_username`, `reviews`.`media_id` AS `media_id`, `rating`.`rating_rating` AS `rating_rating`, `reviews`.`review_content` AS `review_content` FROM `reviews` INNER JOIN `accounts` ON `reviews`.`account_id` = `accounts`.`account_id` INNER JOIN `ratings` AS `rating` ON `reviews`.`account_id` = `rating`.`account_id` AND `reviews`.`media_id` = `rating`.`media_id`)SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` WHERE `reviews_view`.`account_id` = ? AND `reviews_view`.`media_id` = ?");
 
             try
             {
@@ -1788,7 +1788,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` WHERE `reviews_view`.`media_id` = ?");
+                "WITH `reviews_view` AS (SELECT `accounts`.`account_id` AS `account_id`, `accounts`.`account_username` AS `account_username`, `reviews`.`media_id` AS `media_id`, `rating`.`rating_rating` AS `rating_rating`, `reviews`.`review_content` AS `review_content` FROM `reviews` INNER JOIN `accounts` ON `reviews`.`account_id` = `accounts`.`account_id` INNER JOIN `ratings` AS `rating` ON `reviews`.`account_id` = `rating`.`account_id` AND `reviews`.`media_id` = `rating`.`media_id`)SELECT `reviews_view`.`account_id`, `reviews_view`.`account_username`, `reviews_view`.`media_id`, `reviews_view`.`rating_rating`, `reviews_view`.`review_content` FROM `reviews_view` WHERE `reviews_view`.`media_id` = ?");
 
             try
             {
@@ -1835,7 +1835,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `movies_view`.`movie_id`, `movies_view`.`movie_title`, `movies_view`.`movie_description`, `movies_view`.`movie_cover_image_id`, `movies_view`.`movie_release_date`, `movies_view`.`movie_length_minutes`, `movies_view`.`movie_rating`, `movies_view`.`movie_rating_count`, `movies_view`.`movie_review_count` FROM `movies_view` ".$rawCondition);
+                "WITH `movies_view` AS (SELECT `media`.`media_id` AS `movie_id`, `media`.`media_title` AS `movie_title`, `media`.`media_description` AS `movie_description`, `media`.`media_cover_image_id` AS `movie_cover_image_id`, `media`.`media_release_date` AS `movie_release_date`, `movies`.`movie_length_minutes` AS `movie_length_minutes`, AVG(`ratings`.`rating_rating`) AS `movie_rating`, COUNT(`ratings`.`account_id`) AS `movie_rating_count`, COUNT(`reviews`.`account_id`) AS `movie_review_count` FROM `movies` INNER JOIN `media` ON `movies`.`media_id` = `media`.`media_id` LEFT JOIN `ratings` ON `movies`.`media_id` = `ratings`.`media_id` LEFT JOIN `reviews` ON `movies`.`media_id` = `reviews`.`media_id` AND `ratings`.`account_id` = `reviews`.`account_id` GROUP BY `movies`.`media_id`)SELECT `movies_view`.`movie_id`, `movies_view`.`movie_title`, `movies_view`.`movie_description`, `movies_view`.`movie_cover_image_id`, `movies_view`.`movie_release_date`, `movies_view`.`movie_length_minutes`, `movies_view`.`movie_rating`, `movies_view`.`movie_rating_count`, `movies_view`.`movie_review_count` FROM `movies_view` ".$rawCondition);
 
             try
             {
@@ -1888,7 +1888,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `movies_view`.`movie_id`, `movies_view`.`movie_title`, `movies_view`.`movie_description`, `movies_view`.`movie_cover_image_id`, `movies_view`.`movie_release_date`, `movies_view`.`movie_length_minutes`, `movies_view`.`movie_rating`, `movies_view`.`movie_rating_count`, `movies_view`.`movie_review_count` FROM `movies_view` WHERE `movies_view`.`movie_id` = ?");
+                "WITH `movies_view` AS (SELECT `media`.`media_id` AS `movie_id`, `media`.`media_title` AS `movie_title`, `media`.`media_description` AS `movie_description`, `media`.`media_cover_image_id` AS `movie_cover_image_id`, `media`.`media_release_date` AS `movie_release_date`, `movies`.`movie_length_minutes` AS `movie_length_minutes`, AVG(`ratings`.`rating_rating`) AS `movie_rating`, COUNT(`ratings`.`account_id`) AS `movie_rating_count`, COUNT(`reviews`.`account_id`) AS `movie_review_count` FROM `movies` INNER JOIN `media` ON `movies`.`media_id` = `media`.`media_id` LEFT JOIN `ratings` ON `movies`.`media_id` = `ratings`.`media_id` LEFT JOIN `reviews` ON `movies`.`media_id` = `reviews`.`media_id` AND `ratings`.`account_id` = `reviews`.`account_id` GROUP BY `movies`.`media_id`)SELECT `movies_view`.`movie_id`, `movies_view`.`movie_title`, `movies_view`.`movie_description`, `movies_view`.`movie_cover_image_id`, `movies_view`.`movie_release_date`, `movies_view`.`movie_length_minutes`, `movies_view`.`movie_rating`, `movies_view`.`movie_rating_count`, `movies_view`.`movie_review_count` FROM `movies_view` WHERE `movies_view`.`movie_id` = ?");
 
             try
             {
@@ -1938,7 +1938,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` ".$rawCondition);
+                "WITH `genres_of_media_view` AS (SELECT `genres_of_media`.`media_id` AS `media_id`, `genres`.`genre` AS `genre` FROM `genres_of_media` INNER JOIN `genres` ON `genres_of_media`.`genre` = `genres`.`genre_id`)SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` ".$rawCondition);
 
             try
             {
@@ -1978,7 +1978,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` WHERE `genres_of_media_view`.`media_id` = ? AND `genres_of_media_view`.`genre` = ?");
+                "WITH `genres_of_media_view` AS (SELECT `genres_of_media`.`media_id` AS `media_id`, `genres`.`genre` AS `genre` FROM `genres_of_media` INNER JOIN `genres` ON `genres_of_media`.`genre` = `genres`.`genre_id`)SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` WHERE `genres_of_media_view`.`media_id` = ? AND `genres_of_media_view`.`genre` = ?");
 
             try
             {
@@ -2014,7 +2014,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` WHERE `genres_of_media_view`.`media_id` = ?");
+                "WITH `genres_of_media_view` AS (SELECT `genres_of_media`.`media_id` AS `media_id`, `genres`.`genre` AS `genre` FROM `genres_of_media` INNER JOIN `genres` ON `genres_of_media`.`genre` = `genres`.`genre_id`)SELECT `genres_of_media_view`.`media_id`, `genres_of_media_view`.`genre` FROM `genres_of_media_view` WHERE `genres_of_media_view`.`media_id` = ?");
 
             try
             {
@@ -2055,7 +2055,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` ".$rawCondition);
+                "WITH `people_in_media_view` AS (SELECT `people`.`person_id` AS `person_id`, `people`.`person_full_name` AS `person_full_name`, `people`.`person_description` AS `person_description`, `people_in_media`.`media_id` AS `media_id`, `person_in_media_jobs`.`person_in_media_job` AS `person_in_media_job` FROM `people_in_media` INNER JOIN `people` ON `people_in_media`.`person_id` = `people`.`person_id` INNER JOIN `person_in_media_jobs` ON `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`)SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` ".$rawCondition);
 
             try
             {
@@ -2102,7 +2102,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`person_id` = ? AND `people_in_media_view`.`media_id` = ? AND `people_in_media_view`.`person_in_media_job` = ?");
+                "WITH `people_in_media_view` AS (SELECT `people`.`person_id` AS `person_id`, `people`.`person_full_name` AS `person_full_name`, `people`.`person_description` AS `person_description`, `people_in_media`.`media_id` AS `media_id`, `person_in_media_jobs`.`person_in_media_job` AS `person_in_media_job` FROM `people_in_media` INNER JOIN `people` ON `people_in_media`.`person_id` = `people`.`person_id` INNER JOIN `person_in_media_jobs` ON `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`)SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`person_id` = ? AND `people_in_media_view`.`media_id` = ? AND `people_in_media_view`.`person_in_media_job` = ?");
 
             try
             {
@@ -2145,7 +2145,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`media_id` = ?");
+                "WITH `people_in_media_view` AS (SELECT `people`.`person_id` AS `person_id`, `people`.`person_full_name` AS `person_full_name`, `people`.`person_description` AS `person_description`, `people_in_media`.`media_id` AS `media_id`, `person_in_media_jobs`.`person_in_media_job` AS `person_in_media_job` FROM `people_in_media` INNER JOIN `people` ON `people_in_media`.`person_id` = `people`.`person_id` INNER JOIN `person_in_media_jobs` ON `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`)SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`media_id` = ?");
 
             try
             {
@@ -2192,7 +2192,7 @@
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`media_id` = ? AND `people_in_media_view`.`person_in_media_job` = ?");
+                "WITH `people_in_media_view` AS (SELECT `people`.`person_id` AS `person_id`, `people`.`person_full_name` AS `person_full_name`, `people`.`person_description` AS `person_description`, `people_in_media`.`media_id` AS `media_id`, `person_in_media_jobs`.`person_in_media_job` AS `person_in_media_job` FROM `people_in_media` INNER JOIN `people` ON `people_in_media`.`person_id` = `people`.`person_id` INNER JOIN `person_in_media_jobs` ON `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`)SELECT `people_in_media_view`.`person_id`, `people_in_media_view`.`person_full_name`, `people_in_media_view`.`person_description`, `people_in_media_view`.`media_id`, `people_in_media_view`.`person_in_media_job` FROM `people_in_media_view` WHERE `people_in_media_view`.`media_id` = ? AND `people_in_media_view`.`person_in_media_job` = ?");
 
             try
             {

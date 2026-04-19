@@ -309,7 +309,18 @@ export function phpFileFrom(structure: DatabaseStructure): string
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `;
+                "`;
+
+        if (isView)
+        {
+            php += `WITH \``;
+            php += tableName;
+            php += `\` AS (`;
+            php += table.query.replaceAll(/\s+/g, " ");
+            php += `)`;
+        }
+
+        php += `SELECT `;
 
         firstColumn = true;
         for (const [columnName] of columns)
@@ -480,7 +491,18 @@ export function phpFileFrom(structure: DatabaseStructure): string
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `;
+                "`;
+
+                    if (isView)
+                    {
+                        php += `WITH \``;
+                        php += tableName;
+                        php += `\` AS (`;
+                        php += table.query.replaceAll(/\s+/g, " ");
+                        php += `)`;
+                    }
+
+                    php += `SELECT `;
 
                     firstColumn = true;
                     for (const [columnName] of columns)
@@ -681,7 +703,18 @@ export function phpFileFrom(structure: DatabaseStructure): string
         {
             $stmt = new mysqli_stmt(
                 $this->connection,
-                "SELECT `;
+                "`;
+
+                    if (isView)
+                    {
+                        php += `WITH \``;
+                        php += tableName;
+                        php += `\` AS (`;
+                        php += table.query.replaceAll(/\s+/g, " ");
+                        php += `)`;
+                    }
+
+                    php += `SELECT `;
 
                     firstColumn = true;
                     for (const [columnName] of columns)

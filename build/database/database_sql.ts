@@ -276,16 +276,20 @@ ALTER TABLE \``;
 
     const views = structure.views;
 
+    sql += `
+# InfinityFree, I am speechless.
+`;
     for (const [viewName, view] of views)
     {
         sql += `
-CREATE VIEW \``;
+# CREATE VIEW \``;
 
         sql += viewName;
         sql += `\` AS
 `;
 
-        sql += view.query;
+        sql += `# `;
+        sql += view.query.replaceAll("\n", "\n# ");
         sql += `;
 `;
     }
