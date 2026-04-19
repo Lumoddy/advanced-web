@@ -20,11 +20,19 @@
         }
 
         /**
+         * @return string
+         */
+        public function getError(): string
+        {
+            return $this->type;
+        }
+
+        /**
          * @return array{error: string, message: string}
          */
         public function as_array(): array
         {
-            return ["error" => $this->type, "message" => $this->getMessage()];
+            return ["error" => $this->getError(), "message" => $this->getMessage()];
         }
     }
 
@@ -87,7 +95,17 @@
      */
     function request_param_bool(string $name): ?bool
     {
-        return isset($_GET[$name]) ? $_GET[$name] !== "false" : null;
+        if (!isset($_GET[$name]))
+            return null;
+
+        switch ($_GET[$name])
+        {
+            case "false":
+            case "off":
+                return false;
+            default:
+                return true;
+        }
     }
 
     /**

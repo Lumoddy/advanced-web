@@ -12,12 +12,29 @@
     }
 
     $account = api_account_info();
+
+    try
+    {
+        $is_favorite = api_is_favorite()["is_favorite"];
+    }
+    catch (api_error $e)
+    {
+        switch ($e->getError())
+        {
+            case "login/not-logged-in":
+                $is_favorite = null;
+                break;
+            default:
+                throw $e;
+        }
+    }
 ?>
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <title>Newly Nostalgic - Media</title>
   <?php require __DIR__."/part/default_head.php" ?>
+  <script type="module" src="./js/page/favorite_button.js"></script>
 </head>
 <body>
   <div<?php require __DIR__."/part/background.php" ?>/div>
@@ -38,43 +55,79 @@
         src="./img/<?php echo $media["media"]["id"] ?>.jpg"
         style="width: min(40vw, 360px); aspect-ratio: 2/3;">
       <section class="glass panel" style="flex: 1; margin: 16px">
-        <h1><?php echo $media["media"]["title"] ?></h1>
-        <div>
+        <div
+          style="
+            margin: 16px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            align-items: center;
+            gap: 8px">
+          <h1 style="margin: 0"><?php echo $media["media"]["title"] ?></h1>
           <?php
-              if (is_float($media["rating"]))
+              if (is_bool($is_favorite))
               {
                   ?>
+                    <favorite-selector>
+                      <input
+                        id="favorite"
+                        type="checkbox"
+                        <?php if ($is_favorite) echo "checked" ?>
+                        data-for-media="<?php echo $media["media"]["id"] ?>">
+                      <label for="favorite">
+                        <svg class="on" <?php require __DIR__."/part/heart_filled_icon.php" ?>svg>
+                        <svg class="off" <?php require __DIR__."/part/heart_icon.php" ?>svg>
+                      </label>
+                    </favorite-selector>
+                  <?php
+              }
+          ?>
+        </div>
+        <div
+          style="
+            margin: 16px;
+            display: flex;
+            flex-flow: row nowrap;
+            justify-content: stretch;
+            align-items: center">
+          <?php
+              if (is_float($media["media"]["rating"]))
+              {
+                  ?>
+                    <span class="rating">(<?php
+                        echo number_format($media["media"]["rating"], 1);
+                    ?>)</span>
                     <rating-display>
                       <svg<?php
-                          require $media["rating"] > 0.5
+                          require $media["media"]["rating"] >= 0.5
                               ? __DIR__."/part/star_filled_icon.php"
                               : __DIR__."/part/star_icon.php";
                       ?>svg>
                       <svg<?php
-                          require $media["rating"] > 1.5
+                          require $media["media"]["rating"] >= 1.5
                               ? __DIR__."/part/star_filled_icon.php"
                               : __DIR__."/part/star_icon.php";
                       ?>svg>
                       <svg<?php
-                          require $media["rating"] > 2.5
+                          require $media["media"]["rating"] >= 2.5
                               ? __DIR__."/part/star_filled_icon.php"
                               : __DIR__."/part/star_icon.php";
                       ?>svg>
                       <svg<?php
-                          require $media["rating"] > 3.5
+                          require $media["media"]["rating"] >= 3.5
                               ? __DIR__."/part/star_filled_icon.php"
                               : __DIR__."/part/star_icon.php";
                       ?>svg>
                       <svg<?php
-                          require $media["rating"] > 4.5
+                          require $media["media"]["rating"] >= 4.5
                               ? __DIR__."/part/star_filled_icon.php"
                               : __DIR__."/part/star_icon.php";
                       ?>svg>
                     </rating-display>
-                    <span class="rating">(<?php
-                        echo $media["rating_count"];
+                    <span class="rating" style="align-self: start">(<?php
+                        echo $media["media"]["rating_count"];
                     ?> <?php
-                        echo $media["rating_count"] === 1 ? "rating" : "ratings";
+                        echo $media["media"]["rating_count"] === 1 ? "rating" : "ratings";
                     ?>)</span>
                   <?php
               }
@@ -127,14 +180,17 @@
         <p>
           <?php
               $first = true;
-              foreach ($media["writers"] as $person)
+              foreach ($media["people"] as $person)
               {
+                  if ($person["job"] !== "writer")
+                      continue;
+
                   if ($first)
                       $first = false;
                   else
                       echo ", ";
 
-                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["id"] ?>&through=writer"><?php
+                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["person_id"] ?>&through=writer"><?php
                       echo $person["full_name"]
                   ?></a><?php
               }
@@ -144,14 +200,17 @@
         <p>
           <?php
               $first = true;
-              foreach ($media["directors"] as $person)
+              foreach ($media["people"] as $person)
               {
+                  if ($person["job"] !== "director")
+                      continue;
+
                   if ($first)
                       $first = false;
                   else
                       echo ", ";
 
-                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["id"] ?>&through=director"><?php
+                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["person_id"] ?>&through=director"><?php
                       echo $person["full_name"]
                   ?></a><?php
               }
@@ -161,14 +220,17 @@
         <p>
           <?php
               $first = true;
-              foreach ($media["cast"] as $person)
+              foreach ($media["people"] as $person)
               {
+                  if ($person["job"] !== "cast")
+                      continue;
+
                   if ($first)
                       $first = false;
                   else
                       echo ", ";
 
-                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["id"] ?>&through=cast"><?php
+                  ?><a href="./search.php?for=movies&with_person=<?php echo $person["person_id"] ?>&through=cast"><?php
                       echo $person["full_name"]
                   ?></a><?php
               }

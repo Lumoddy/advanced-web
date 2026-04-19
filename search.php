@@ -112,19 +112,29 @@
                 }
             }
         ?>
-        <input
-          id="search-movie-name"
-          class="glass"
-          type="search"
-          name="name"
-          placeholder="Name..."
-          <?php
-              $posted_search_name = request_param("name");
-              if (is_string($posted_search_name))
-              {
-                  ?>value="<?php echo $posted_search_name ?>"<?php
-              }
-          ?>>
+        <div>
+          <label for="search-movie-only-fav">Only Show Favorites</label>
+          <input
+            id="search-movie-only-fav"
+            type="checkbox"
+            name="only-fav"
+            <?php if (request_param_bool("only-fav") ?? false) echo "checked" ?>>
+        </div>
+        <div>
+          <input
+            id="search-movie-name"
+            class="glass"
+            type="search"
+            name="name"
+            placeholder="Name..."
+            <?php
+                $posted_search_name = request_param("name");
+                if (is_string($posted_search_name))
+                {
+                    ?>value="<?php echo $posted_search_name ?>"<?php
+                }
+            ?>>
+        </div>
         <details <?php if (!$no_genres) echo "open" ?>>
           <summary style="font-size: large; font-weight: bold">Genres</summary>
           <ul>
@@ -203,15 +213,68 @@
                         <a
                           class="glass panel"
                           href="./media.php?id=<?php echo $entry["id"] ?>"
-                          style="width: 140px; display: block">
+                          style="
+                            width: 140px;
+                            color: #FFFFFF;
+                            text-decoration: none">
                           <img
                             src="./img/<?php echo $entry["id"] ?>.jpg"
                             style="width: 100%; aspect-ratio: 2/3">
-                          <div style="margin: 4px 8px 4px">
+                          <div style="margin: 4px 8px 4px;">
                             <h3
                               style="margin: 0; font-size: medium">
                               <?php echo $entry["title"] ?>
                             </h3>
+                          </div>
+                          <div
+                            style="
+                              display: flex;
+                              flex-flow: row nowrap;
+                              justify-content: end;
+                              align-items: center">
+                            <?php
+                                if (is_float($entry["rating"]))
+                                {
+                                    ?>
+                                      <span
+                                        class="rating"
+                                        style="font-size: small">(<?php
+                                            echo number_format($entry["rating"], 1)
+                                        ?>)</span>
+                                      <rating-display class="small">
+                                        <svg<?php
+                                            require $entry["rating"] >= 0.5
+                                                ? __DIR__."/part/star_filled_icon.php"
+                                                : __DIR__."/part/star_icon.php";
+                                        ?>svg>
+                                        <svg<?php
+                                            require $entry["rating"] >= 1.5
+                                                ? __DIR__."/part/star_filled_icon.php"
+                                                : __DIR__."/part/star_icon.php";
+                                        ?>svg>
+                                        <svg<?php
+                                            require $entry["rating"] >= 2.5
+                                                ? __DIR__."/part/star_filled_icon.php"
+                                                : __DIR__."/part/star_icon.php";
+                                        ?>svg>
+                                        <svg<?php
+                                            require $entry["rating"] >= 3.5
+                                                ? __DIR__."/part/star_filled_icon.php"
+                                                : __DIR__."/part/star_icon.php";
+                                        ?>svg>
+                                        <svg<?php
+                                            require $entry["rating"] >= 4.5
+                                                ? __DIR__."/part/star_filled_icon.php"
+                                                : __DIR__."/part/star_icon.php";
+                                        ?>svg>
+                                      </rating-display>
+                                    <?php
+                                }
+                                else
+                                {
+                                    ?><span class="rating">(No ratings)</span><?php
+                                }
+                            ?>
                           </div>
                         </a>
                       <?php

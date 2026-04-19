@@ -4,6 +4,8 @@ replacements:
   column:
   - - { type: ID }
     - { type: INT, signed: false }
+  - - { type: COUNT }
+    - { type: INT, signed: false }
   - - { type: ENUM }
     - { type: TINYINT, signed: false }
   - - { type: NAME }
@@ -55,6 +57,39 @@ tables:
       - images:
         - image_id
 
+  movies:
+    read_only: true
+    columns:
+      media_id: { PHP Short Single: id, type: ID }
+      movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
+    constraints:
+    - primary_key:
+      - media_id
+    - foreign_key:
+      - - media_id
+      - media:
+        - media_id
+
+  favorites_of_media:
+    PHP Single: favorite_of_media
+    columns:
+      account_id: { PHP Short Single: account_id, type: ID }
+      media_id: { PHP Short Single: media_id, type: ID }
+    constraints:
+    - primary_key:
+      - account_id
+      - media_id
+    - key:
+      - account_id
+    - foreign_key:
+      - - account_id
+      - accounts:
+        - account_id
+    - foreign_key:
+      - - media_id
+      - media:
+        - media_id
+
   people:
     read_only: true
     PHP Single: person
@@ -75,6 +110,8 @@ tables:
     - primary_key:
       - account_id
       - media_id
+    - key:
+      - media_id
     - foreign_key:
       - - account_id
       - accounts:
@@ -84,20 +121,36 @@ tables:
       - media:
         - media_id
 
-  movies:
-    read_only: true
+  reviews:
     columns:
-      media_id: { PHP Short Single: id, type: ID }
-      movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
+      account_id: { PHP Short Single: account_id, type: ID }
+      media_id: { PHP Short Single: media_id, type: ID }
+      review_content: { PHP Short Single: content, type: DESCRIPTION }
     constraints:
     - primary_key:
+      - account_id
+      - media_id
+    - key:
       - media_id
     - foreign_key:
-      - - media_id
-      - media:
+      - - account_id
+        - media_id
+      - ratings:
+        - account_id
         - media_id
 
-  genre_of_media:
+  genres:
+    read_only: true
+    columns:
+      genre_id: { PHP Short Single: id, type: ENUM }
+      genre: { PHP Short Single: name, type: NAME }
+    constraints:
+    - primary_key:
+      - genre_id
+    - unique_key:
+      - genre
+
+  genres_of_media:
     read_only: true
     PHP Single: genre_of_media
     columns:
@@ -115,17 +168,6 @@ tables:
       - - genre
       - genres:
         - genre_id
-
-  genres:
-    read_only: true
-    columns:
-      genre_id: { PHP Short Single: id, type: ENUM }
-      genre: { PHP Short Single: name, type: NAME }
-    constraints:
-    - primary_key:
-      - genre_id
-    - unique_key:
-      - genre
 
   people_in_media:
     read_only: true
@@ -166,14 +208,21 @@ tables:
     - unique_key:
       - person_in_media_job
 
-  reviews:
+views:
+
+  reviews_view:
+    PHP Plural: view_reviews
     columns:
       account_id: { PHP Short Single: account_id, type: ID }
+      account_username: { PHP Short Single: account_username, type: VARCHAR, size: 31 }
       media_id: { PHP Short Single: media_id, type: ID }
-      review_content: { PHP Short Single: content, type: DESCRIPTION }
-    constraints:
+      rating_rating: { PHP Short Single: rating, type: TINYINT, signed: false }
+      review_content: { PHP Short Single: review, type: DESCRIPTION }
+    keys:
     - primary_key:
       - account_id
+      - media_id
+    - key:
       - media_id
     - foreign_key:
       - - account_id
@@ -181,3 +230,108 @@ tables:
       - ratings:
         - account_id
         - media_id
+    query: |-
+      SELECT
+          `accounts`.`account_id` AS `account_id`,
+          `accounts`.`account_username` AS `account_username`,
+          `reviews`.`media_id` AS `media_id`,
+          `rating`.`rating_rating` AS `rating_rating`,
+          `reviews`.`review_content` AS `review_content`
+      FROM `reviews`
+      INNER JOIN `accounts`
+          ON `reviews`.`account_id` = `accounts`.`account_id`
+      INNER JOIN `ratings` AS `rating`
+          ON `reviews`.`account_id` = `rating`.`account_id`
+          AND `reviews`.`media_id` = `rating`.`media_id`
+
+  movies_view:
+    PHP Plural: view_movies
+    columns:
+      movie_id: { PHP Short Single: id, type: ID }
+      movie_title: { PHP Short Single: title, type: TITLE }
+      movie_description: { PHP Short Single: description, type: DESCRIPTION }
+      movie_cover_image_id: { PHP Short Single: cover_image_id, type: ID }
+      movie_release_date: { PHP Short Single: release_date, type: DATE }
+      movie_length_minutes: { PHP Short Single: minutes, type: SMALLINT, signed: false }
+      movie_rating: { PHP Short Single: rating, type: FLOAT, nullable: true }
+      movie_rating_count: { PHP Short Single: rating_count, type: COUNT }
+      movie_review_count: { PHP Short Single: review_count, type: COUNT }
+    keys:
+    - primary_key:
+      - movie_id
+    - foreign_key:
+      - - movie_cover_image_id
+      - images:
+        - image_id
+    query: |-
+      SELECT
+          `media`.`media_id` AS `movie_id`,
+          `media`.`media_title` AS `movie_title`,
+          `media`.`media_description` AS `movie_description`,
+          `media`.`media_cover_image_id` AS `movie_cover_image_id`,
+          `media`.`media_release_date` AS `movie_release_date`,
+          `movies`.`movie_length_minutes` AS `movie_length_minutes`,
+          AVG(`ratings`.`rating_rating`) AS `movie_rating`,
+          COUNT(`ratings`.`account_id`) AS `movie_rating_count`,
+          COUNT(`reviews`.`account_id`) AS `movie_review_count`
+      FROM `movies`
+      INNER JOIN `media`
+          ON `movies`.`media_id` = `media`.`media_id`
+      LEFT JOIN `ratings`
+          ON `movies`.`media_id` = `ratings`.`media_id`
+      LEFT JOIN `reviews`
+          ON `movies`.`media_id` = `reviews`.`media_id`
+          AND `ratings`.`account_id` = `reviews`.`account_id`
+      GROUP BY `movies`.`media_id`
+
+  genres_of_media_view:
+    PHP Plural: view_genres_of_media
+    PHP Single: view_genre_of_media
+    columns:
+      media_id: { PHP Short Single: media_id, type: ID }
+      genre: { PHP Short Single: name, type: NAME }
+    keys:
+    - primary_key:
+      - media_id
+      - genre
+    - key:
+      - media_id
+    query: |-
+      SELECT
+          `genres_of_media`.`media_id` AS `media_id`,
+          `genres`.`genre` AS `genre`
+      FROM `genres_of_media`
+      INNER JOIN `genres`
+          ON `genres_of_media`.`genre` = `genres`.`genre_id`
+
+  people_in_media_view:
+    PHP Plural: view_people_in_media
+    PHP Single: view_person_in_media
+    columns:
+      person_id: { PHP Short Single: person_id, type: ID }
+      person_full_name: { PHP Short Single: full_name, type: NAME }
+      person_description: { PHP Short Single: description, type: DESCRIPTION }
+      media_id: { PHP Short Single: media_id, type: ID }
+      person_in_media_job: { PHP Short Single: job, type: NAME }
+    keys:
+    - primary_key:
+      - person_id
+      - media_id
+      - person_in_media_job
+    - key:
+      - media_id
+    - key:
+      - media_id
+      - person_in_media_job
+    query: |-
+      SELECT
+          `people`.`person_id` AS `person_id`,
+          `people`.`person_full_name` AS `person_full_name`,
+          `people`.`person_description` AS `person_description`,
+          `people_in_media`.`media_id` AS `media_id`,
+          `person_in_media_jobs`.`person_in_media_job` AS `person_in_media_job`
+      FROM `people_in_media`
+      INNER JOIN `people`
+          ON `people_in_media`.`person_id` = `people`.`person_id`
+      INNER JOIN `person_in_media_jobs`
+          ON `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`

@@ -13,11 +13,11 @@ await(async(s)=>location.href=(await(await fetch("https://api.imdbapi.dev/titles
 console.log(`# ${location.href.replace(/\/?[&?]ref_=[^&]*/,"")}
 SET @media_title = ${JSON.stringify(document.querySelector(".hero__primary-text").textContent)};
 
-INSERT INTO \`movies_source\` (\`media_id\`, \`media_title\`, \`movie_length_minutes\`, \`media_release_date\`, \`media_description\`)
+INSERT INTO \`movie_source\` (\`media_id\`, \`media_title\`, \`movie_length_minutes\`, \`media_release_date\`, \`media_description\`)
 VALUES
     (INSERTIDHERE, @media_title, (60 * ${[...document.querySelectorAll("ul.ipc-inline-list--show-dividers > li")].map((x)=>/(\d+)h(?:\s+(\d+)m)?/.exec(x.textContent)).find((x)=>x!==null).toSpliced(0, 1).map((x)=>x??"0").join(") + ")}, ${JSON.stringify((()=>{const d=new Date([...document.querySelectorAll("section.ipc-page-section > div > ul > li > a:nth-child(1)")].find((x)=>x.textContent==="Release date").nextSibling.textContent);return`${d.getFullYear().toString()}-${(d.getMonth()+1).toString().padStart(2,"0")}-${d.getDate().toString().padStart(2,"0")}`})())}, ${JSON.stringify(document.querySelector(".sc-9a16f31-1 > span:nth-child(1) > span:nth-child(1)").textContent)});
 
-INSERT INTO \`people_source\` (\`media_title\`, \`person_in_media_job\`, \`person_full_name\`)
+INSERT INTO \`person_source\` (\`media_title\`, \`person_in_media_job\`, \`person_full_name\`)
 VALUES
     ${[...[...document.querySelectorAll("[data-testid=\"title-cast\"] .ipc-sub-grid--wraps-at-above-l > div > div:nth-child(2) > a")].map((x)=>`(@media_title, "cast", ${JSON.stringify(x.textContent)})`),...[...document.querySelectorAll("ul.ipc-metadata-list:nth-child(3) > li:nth-child(1) > div:nth-child(2) > ul:nth-child(1) > li > a:nth-child(1)")].map((x)=>`(@media_title, "director", ${JSON.stringify(x.textContent)})`),...[...document.querySelectorAll("ul.ipc-metadata-list:nth-child(3) > li:nth-child(2) > div:nth-child(2) > ul:nth-child(1) > li > a:nth-child(1)")].map((x)=>`(@media_title, "writer", ${JSON.stringify(x.textContent)})`)].join(",\n    ")};
 

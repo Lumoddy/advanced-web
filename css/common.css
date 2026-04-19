@@ -277,7 +277,6 @@ rating-selector
     flex-flow: row nowrap;
     justify-content: start;
     align-items: start;
-    align-content: start;
 
     & > input
     {
@@ -295,6 +294,7 @@ rating-selector
         width: 32px;
         height: 32px;
         position: relative;
+        cursor: pointer;
 
         & > .off, & > .on
         {
@@ -320,7 +320,7 @@ rating-selector
         }
     }
 
-    & > input:is(:hover, :focus-visible) + label
+    & > input:focus-visible + label
     {
         outline: auto;
     }
@@ -339,7 +339,6 @@ rating-display
     flex-flow: row nowrap;
     justify-content: start;
     align-items: start;
-    align-content: start;
 
     & > svg
     {
@@ -352,8 +351,8 @@ rating-display.small
 {
     & > svg
     {
-        width: 28px;
-        height: 28px;
+        width: 20px;
+        height: 20px;
     }
 }
 
@@ -363,6 +362,69 @@ rating-display.large
     {
         width: 48px;
         height: 48px;
+    }
+}
+
+favorite-selector
+{
+    margin: 6px 4px 2px;
+    display: flex;
+    position: relative;
+    flex-flow: row nowrap;
+    justify-content: start;
+    align-items: start;
+
+    & > input
+    {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 0;
+        height: 0;
+        appearance: none;
+        outline: none;
+    }
+
+    & > label
+    {
+        width: 48px;
+        height: 48px;
+        position: relative;
+        cursor: pointer;
+
+        & > .off, & > .on
+        {
+            position: absolute;
+            inset: 0;
+        }
+
+        & > .off { display: block }
+        & > .on { display: none }
+
+        @media not (prefers-reduced-motion), all
+        {
+            translate: 0 0;
+            transition:
+                translate ease-out 0.2s;
+
+            &:hover, &:focus-visible
+            {
+                translate: 0 -4px;
+                transition:
+                    translate ease-out 0.1s;
+            }
+        }
+    }
+
+    & > input:focus-visible + label
+    {
+        outline: auto;
+    }
+
+    & > input:checked + label
+    {
+        & > .off { display: none }
+        & > .on { display: block }
     }
 }
 

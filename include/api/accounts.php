@@ -58,38 +58,39 @@
 
             try
             {
-                $account = $connection->insert_account_with_unique_id(
+                try
+                {
+                    $account_id = $connection->insert_account_with_unique_id(
+                        $posted_username,
+                        $posted_email,
+                        password_hash($posted_password, PASSWORD_DEFAULT));
+                }
+                catch (mysqli_sql_exception $e)
+                {
+                    switch ($e->getCode())
+                    {
+                        case mysqli_error_code::ER_DUP_ENTRY;
+                            throw new api_error(
+                                "login/duplicate",
+                                "The provided email has already been used to create an account.");
+                        default:
+                            throw $e;
+                    }
+                }
+
+                $_SESSION["account_id"] = $account_id;
+                $_SESSION["account_username"] = $posted_username;
+                $_SESSION["account_email"] = $posted_email;
+
+                return
                 [
+                    "is_logged_in" => true,
+                    "id" => $account_id,
                     "username" => $posted_username,
                     "email" => $posted_email,
-                    "password_hash" => password_hash($posted_password, PASSWORD_DEFAULT),
-                ]);
-            }
-            catch (mysqli_sql_exception $e)
-            {
-                switch ($e->getCode())
-                {
-                    case mysqli_error_code::ER_DUP_ENTRY;
-                        throw new api_error(
-                            "login/duplicate",
-                            "The provided email has already been used to create an account.");
-                    default:
-                        throw $e;
-                }
+                ];
             }
             finally { $connection->close(); }
-
-            $_SESSION["account_id"] = $account["id"];
-            $_SESSION["account_username"] = $account["username"];
-            $_SESSION["account_email"] = $account["email"];
-
-            return
-            [
-                "is_logged_in" => true,
-                "id" => $account["id"],
-                "username" => $account["username"],
-                "email" => $account["email"],
-            ];
         }
         else
         {
@@ -134,25 +135,37 @@
                         }
                     }
                 }
+
+                if (!isset($matching_account))
+                    throw new api_error(
+                        "login/not-found",
+                        "No account was found with that email or password.");
+
+                $_SESSION["account_id"] = $matching_account["id"];
+                $_SESSION["account_username"] = $matching_account["username"];
+                $_SESSION["account_email"] = $matching_account["email"];
+
+                return
+                [
+                    "is_logged_in" => true,
+                    "id" => $matching_account["id"],
+                    "username" => $matching_account["username"],
+                    "email" => $matching_account["email"],
+                ];
+
+                $_SESSION["account_id"] = $account_id;
+                $_SESSION["account_username"] = $posted_username;
+                $_SESSION["account_email"] = $posted_email;
+
+                return
+                [
+                    "is_logged_in" => true,
+                    "id" => $account_id,
+                    "username" => $posted_username,
+                    "email" => $posted_email,
+                ];
             }
             finally { $connection->close(); }
-
-            if (!isset($matching_account))
-                throw new api_error(
-                    "login/not-found",
-                    "No account was found with that email or password.");
-
-            $_SESSION["account_id"] = $matching_account["id"];
-            $_SESSION["account_username"] = $matching_account["username"];
-            $_SESSION["account_email"] = $matching_account["email"];
-
-            return
-            [
-                "is_logged_in" => true,
-                "id" => $matching_account["id"],
-                "username" => $matching_account["username"],
-                "email" => $matching_account["email"],
-            ];
         }
     }
 
@@ -204,7 +217,7 @@
      * @return array{posted: true, replaced: bool}
      * @throws api_error
      */
-    function api_post_review(): ?array
+    function api_post_review(): array
     {
         if (session_status() !== PHP_SESSION_ACTIVE)
             session_start();
@@ -251,24 +264,116 @@
                 $account_id,
                 $posted_id);
 
-            $connection->insert_ratings(
-            [
-                "account_id" => $account_id,
-                "media_id" => $posted_id,
-                "rating" => $posted_rating,
-            ]);
+            $connection->insert_rating_account_id_and_media_id_and_rating(
+                $account_id,
+                $posted_id,
+                $posted_rating);
 
             if (is_string($posted_review))
             {
-                $connection->insert_reviews(
-                [
-                    "account_id" => $account_id,
-                    "media_id" => $posted_id,
-                    "content" => $posted_review,
-                ]);
+                $connection->insert_review_account_id_and_media_id_and_content(
+                    $account_id,
+                    $posted_id,
+                    $posted_review);
             }
 
             return [ "posted" => true, "replaced" => $replaced ];
+        }
+        finally { $connection->close(); }
+    }
+
+    /**
+     * Public API
+     * @return array{is_favorite: bool}
+     * @throws api_error
+     */
+    function api_is_favorite(): array
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
+
+        $account_id = isset($_SESSION["account_id"]) ? (int)$_SESSION["account_id"] : null;
+
+        if (!is_int($account_id))
+            throw new api_error(
+                "login/not-logged-in",
+                "You must be logged in before posting a review.");
+
+        $posted_id = request_param_int("id");
+
+        if (!is_int($posted_id))
+            throw new api_error(
+                "syntax/missing-param",
+                "Missing field 'id'.");
+
+        $connection = new database_access();
+
+        try
+        {
+            $is_favorite = !is_null($connection->select_favorite_of_media_with_account_id_and_media_id(
+                $account_id,
+                $posted_id));
+
+            return [ "is_favorite" => $is_favorite ];
+        }
+        finally { $connection->close(); }
+    }
+
+    /**
+     * Public API
+     * @return array{is_favorite: bool, was_favorite: bool}
+     * @throws api_error
+     */
+    function api_set_favorite(): array
+    {
+        if (session_status() !== PHP_SESSION_ACTIVE)
+            session_start();
+
+        $account_id = isset($_SESSION["account_id"]) ? (int)$_SESSION["account_id"] : null;
+
+        if (!is_int($account_id))
+            throw new api_error(
+                "login/not-logged-in",
+                "You must be logged in before posting a review.");
+
+        $posted_id = request_param_int("id");
+
+        if (!is_int($posted_id))
+            throw new api_error(
+                "syntax/missing-param",
+                "Missing field 'id'.");
+
+        $connection = new database_access();
+
+        try
+        {
+            $was_favorite = !is_null($connection->select_favorite_of_media_with_account_id_and_media_id(
+                $account_id,
+                $posted_id));
+
+            $is_favorite = request_param_bool("set") ?? true;
+
+            if ($is_favorite !== $was_favorite)
+            {
+                if ($is_favorite)
+                {
+                    $connection->insert_favorite_of_media_account_id_and_media_id(
+                        $account_id,
+                        $posted_id);
+                }
+                else
+                {
+                    $connection->delete_favorite_of_media_with_account_id_and_media_id(
+                        $account_id,
+                        $posted_id);
+                }
+            }
+
+            return
+            [
+                "is_favorite" => $is_favorite,
+                "was_favorite" => $was_favorite,
+            ];
         }
         finally { $connection->close(); }
     }

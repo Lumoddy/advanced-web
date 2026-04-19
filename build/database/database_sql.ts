@@ -274,6 +274,22 @@ ALTER TABLE \``;
         }
     }
 
+    const views = structure.views;
+
+    for (const [viewName, view] of views)
+    {
+        sql += `
+CREATE VIEW \``;
+
+        sql += viewName;
+        sql += `\` AS
+`;
+
+        sql += view.query;
+        sql += `;
+`;
+    }
+
     sql += `
 COMMIT;
 `;

@@ -1,11 +1,12 @@
 <?php
     declare(strict_types=1);
+    require_once __DIR__."/accounts.php";
     require_once __DIR__."/common.php";
     require_once __DIR__."/../database.php";
 
     /**
      * Public API
-     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
+     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime, minutes: int, rating: ?float, rating_count: int, review_count: int}[]
      * @throws api_error
      */
     function api_search_media(): array
@@ -13,6 +14,7 @@
         $posted_search_name = request_param("name");
         $posted_search_with_person = request_param_int("with_person");
         $posted_search_through = request_param("through");
+        $posted_only_fav = request_param_bool("only-fav");
         $posted_limit = request_param_int("limit");
 
         if (!is_int($posted_limit))
@@ -58,7 +60,9 @@
 
             if (is_string($posted_search_name))
             {
-                array_push($conditions, "`media`.`media_title` LIKE CONCAT(\"%\", ?, \"%\")");
+                array_push(
+                    $conditions,
+                    "`movies_view`.`movie_title` LIKE CONCAT(\"%\", ?, \"%\")");
                 $bind_types .= "s";
                 array_push($bind, $posted_search_name);
             }
@@ -67,13 +71,17 @@
             {
                 if (is_string($posted_search_through))
                 {
-                    array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job_id` = `people_in_media`.`person_in_media_job` AND `person_in_media_jobs`.`person_in_media_job` = ? WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
+                    array_push(
+                        $conditions,
+                        "EXISTS(SELECT NULL FROM `people_in_media` INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job_id` = `people_in_media`.`person_in_media_job` AND `person_in_media_jobs`.`person_in_media_job` = ? WHERE `people_in_media`.`media_id` = `movies_view`.`movie_id` AND `people_in_media`.`person_id` = ?)");
                     $bind_types .= "si";
                     array_push($bind, $posted_search_through, $posted_search_with_person);
                 }
                 else
                 {
-                    array_push($conditions, "EXISTS(SELECT NULL FROM `people_in_media` WHERE `people_in_media`.`media_id` = `media`.`media_id` AND `people_in_media`.`person_id` = ?)");
+                    array_push(
+                        $conditions,
+                        "EXISTS(SELECT NULL FROM `people_in_media` WHERE `people_in_media`.`media_id` = `movies_view`.`movie_id` AND `people_in_media`.`person_id` = ?)");
                     $bind_types .= "i";
                     array_push($bind, $posted_search_with_person);
                 }
@@ -81,7 +89,7 @@
 
             if (!$no_genres)
             {
-                $condition = "EXISTS(SELECT NULL FROM `genre_of_media` WHERE `genre_of_media`.`media_id` = `media`.`media_id` AND `genre_of_media`.`genre` IN (";
+                $condition = "EXISTS(SELECT NULL FROM `genres_of_media` WHERE `genres_of_media`.`media_id` = `movies_view`.`movie_id` AND `genres_of_media`.`genre` IN (";
 
                 $first = true;
                 foreach ($genres as $genre)
@@ -104,9 +112,27 @@
                 array_push($conditions, $condition);
             }
 
+            if ($posted_only_fav ?? false)
+            {
+                $account = api_account_info();
+
+                if ($account["is_logged_in"])
+                {
+                    array_push(
+                        $conditions,
+                        "EXISTS(SELECT NULL FROM `favorites_of_media` WHERE `favorites_of_media`.`media_id` = `movies_view`.`movie_id` AND `favorites_of_media`.`account_id` = ?)");
+                    $bind_types .= "i";
+                    array_push($bind, $account["id"]);
+                }
+                else
+                    return [];
+            }
+
             if (is_string($posted_search_name))
             {
-                array_push($order_bys, "LOCATE(?, `media`.`media_title`)");
+                array_push(
+                    $order_bys,
+                    "LOCATE(?, `movies_view`.`movie_title`)");
                 $bind_types .= "s";
                 array_push($bind, $posted_search_name);
             }
@@ -150,14 +176,14 @@
 
             $sql .= " LIMIT ?";
 
-            return $connection->select_media($sql, $bind_types, ...$bind);
+            return $connection->select_view_movies($sql, $bind_types, ...$bind);
         }
         finally { $connection->close(); }
     }
 
     /**
      * Public API
-     * @return array{media: array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}, rating_count: int, rating: ?float, genres: array{id: int, name: string}[], cast: array{id: int, full_name: string, description: string}[], directors: array{id: int, full_name: string, description: string}[], writers: array{id: int, full_name: string, description: string}[], reviews: array{account_id: int, account_username: string, rating: int, review: string}[]}
+     * @return array{media: array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime, minutes: int, rating: ?float, rating_count: int, review_count: int}, genres: array{media_id: int, name: string}[], people: array{person_id: int, full_name: string, description: string, media_id: int, job: string}[], reviews: array{account_id: int, account_username: string, media_id: int, rating: int, review: string}[]}
      * @throws api_error
      */
     function api_media_info(): array
@@ -178,87 +204,22 @@
             // PHP has the single worst api for a database I have ever seen.
             // I hate PHP so much.
 
-            $media = $connection->select_media_with_id($posted_id);
-            $genres = $connection->select_genres(
-                "INNER JOIN `genre_of_media` ON `genre_of_media`.`media_id` = ? AND `genre_of_media`.`genre` = `genres`.`genre_id`",
-                "i",
-                $posted_id);
-            $cast = $connection->select_people(
-                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"cast\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                "i",
-                $posted_id);
-            $directors = $connection->select_people(
-                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"director\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                "i",
-                $posted_id);
-            $writers = $connection->select_people(
-                "INNER JOIN `person_in_media_jobs` ON `person_in_media_jobs`.`person_in_media_job` = \"writer\" INNER JOIN `people_in_media` ON `people_in_media`.`person_id` = `people`.`person_id` AND `people_in_media`.`media_id` = ? AND `people_in_media`.`person_in_media_job` = `person_in_media_jobs`.`person_in_media_job_id`",
-                "i",
-                $posted_id);
+            $media = $connection->select_view_movie_with_id($posted_id);
 
-            $stmt = new mysqli_stmt(
-                $connection->connection,
-                "SELECT `accounts`.`account_id`, `accounts`.`account_username`, `ratings`.`rating_rating`, `reviews`.`review_content` FROM `ratings` INNER JOIN `accounts` ON `ratings`.`account_id` = `accounts`.`account_id` INNER JOIN `reviews` ON `ratings`.`account_id` = `reviews`.`account_id` AND `ratings`.`media_id` = `reviews`.`media_id` WHERE `ratings`.`media_id` = ?");
+            if (is_null($media))
+                throw new api_error(
+                    "media/not-found",
+                    "No media with the given ID exists.");
 
-            try
-            {
-                $stmt->bind_param("i", $posted_id);
-
-                $stmt->bind_result(
-                    $result_account_id,
-                    $result_account_username,
-                    $result_rating,
-                    $result_review);
-
-                $stmt->execute();
-
-                $reviews = [];
-
-                while ($stmt->fetch())
-                {
-                    array_push(
-                        $reviews,
-                        [
-                            "account_id" => (int)$result_account_id,
-                            "account_username" => (string)$result_account_username,
-                            "rating" => (int)$result_rating,
-                            "review" => (string)$result_review,
-                        ]);
-                }
-            }
-            finally { $stmt->close(); }
-
-            $stmt = new mysqli_stmt(
-                $connection->connection,
-                "SELECT COUNT(*), AVG(`ratings`.`rating_rating`) FROM `ratings` WHERE `ratings`.`media_id` = ?");
-
-            try
-            {
-                $stmt->bind_param("i", $posted_id);
-
-                $result_rating = 0.0;
-
-                $stmt->bind_result(
-                    $result_rating_count,
-                    $result_rating);
-
-                $stmt->execute();
-                $stmt->fetch();
-
-                $rating_count = (int)$result_rating_count;
-                $rating = $result_rating === null ? null : (float)$result_rating;
-            }
-            finally { $stmt->close(); }
+            $genres = $connection->select_view_genres_of_media_with_media_id($posted_id);
+            $people = $connection->select_view_people_in_media_with_media_id($posted_id);
+            $reviews = $connection->select_view_reviews_with_media_id($posted_id);
 
             return
             [
                 "media" => $media,
-                "rating_count" => $rating_count,
-                "rating" => $rating,
                 "genres" => $genres,
-                "cast" => $cast,
-                "directors" => $directors,
-                "writers" => $writers,
+                "people" => $people,
                 "reviews" => $reviews,
             ];
         }
@@ -267,7 +228,7 @@
 
     /**
      * Public API
-     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime}[]
+     * @return array{id: int, title: string, description: string, cover_image_id: int, release_date: DateTime, minutes: int, rating: ?float, rating_count: int, review_count: int}[]
      * @throws api_error
      */
     function api_random_media(): array
@@ -282,7 +243,7 @@
 
         try
         {
-            return $connection->select_media(
+            return $connection->select_view_movies(
                 "ORDER BY RAND() LIMIT ?",
                 "i",
                 $posted_limit);

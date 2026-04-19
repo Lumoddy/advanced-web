@@ -1,14 +1,14 @@
 
 START TRANSACTION;
 
-CREATE TEMPORARY TABLE `movies_source` (
+CREATE TEMPORARY TABLE `movie_source` (
     `media_id` INT UNSIGNED NOT NULL,
     `media_title` VARCHAR(1023) NOT NULL,
     `media_description` TEXT NOT NULL,
     `movie_length_minutes` SMALLINT UNSIGNED NOT NULL,
     `media_release_date` DATE NOT NULL);
 
-CREATE TEMPORARY TABLE `people_source` (
+CREATE TEMPORARY TABLE `person_source` (
     `media_title` VARCHAR(1023) NOT NULL,
     `person_full_name` VARCHAR(255) NOT NULL,
     `person_in_media_job` VARCHAR(255) NOT NULL);
@@ -20,11 +20,11 @@ CREATE TEMPORARY TABLE `genre_source` (
 # https://www.imdb.com/title/tt12042730
 SET @media_title = "Project Hail Mary";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (0 + 100, @media_title, (60 * 2) + 36, "2026-03-20", "A science teacher wakes up alone on a spaceship. As his memory returns, he uncovers a mission to stop a mysterious substance killing Earth's sun and that an unexpected friendship may be the key.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Ryan Gosling"),
     (@media_title, "cast", "Sandra Hüller"),
@@ -58,11 +58,11 @@ VALUES
 # https://www.imdb.com/title/tt15574124
 SET @media_title = "Peaky Blinders: The Immortal Man";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (1 + 100, @media_title, (60 * 1) + 52, "2026-03-20", "During World War II, Tommy Shelby returns to a bombed Birmingham and becomes involved in secret wartime missions facing new threats as he reckons with his past.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Cillian Murphy"),
     (@media_title, "cast", "Rebecca Ferguson"),
@@ -94,11 +94,11 @@ VALUES
 # https://www.imdb.com/title/tt30144839
 SET @media_title = "One Battle After Another";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (2 + 100, @media_title, (60 * 2) + 41, "2025-09-26", "When their enemy resurfaces after 16 years, a group of ex-revolutionaries reunite to rescue the daughter of one of their own.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Leonardo DiCaprio"),
     (@media_title, "cast", "Sean Penn"),
@@ -132,11 +132,11 @@ VALUES
 # https://www.imdb.com/title/tt31193180
 SET @media_title = "Sinners";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (3 + 100, @media_title, (60 * 2) + 17, "2025-04-18", "Trying to leave their troubled lives behind, twin brothers return to their hometown to start again, only to discover that an even greater evil is waiting to welcome them back.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Michael B. Jordan"),
     (@media_title, "cast", "Jack O'Connell"),
@@ -170,11 +170,11 @@ VALUES
 # https://www.imdb.com/title/tt15940132
 SET @media_title = "War Machine";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (4 + 100, @media_title, (60 * 1) + 46, "2026-03-06", "Follow the final recruits of a grueling special ops boot camp who encounter a mysterious deadly force.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Alan Ritchson"),
     (@media_title, "cast", "Stephan James"),
@@ -207,11 +207,11 @@ VALUES
 # https://www.imdb.com/title/tt33014583
 SET @media_title = "Dhurandhar";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (5 + 100, @media_title, (60 * 3) + 34, "2025-12-05", "A mysterious traveler slips into the heart of Karachi's underbelly and rises through its ranks with lethal precision, only to tear the notorious ISI-Underworld nexus apart from within.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Ranveer Singh"),
     (@media_title, "cast", "Akshaye Khanna"),
@@ -247,11 +247,11 @@ VALUES
 # https://www.imdb.com/title/tt39139925
 SET @media_title = "Dhurandhar The Revenge";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (6 + 100, @media_title, (60 * 3) + 50, "2026-03-19", "Jaskirat Singh Rangi descends deeper into his alias as Hamza Ali Mazari, rising through Karachi's criminal hierarchy to claim the feared title ""Sher-e-Baloch"" while balancing loyalty, betrayal, and survival in a ruthless underworld.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Ranveer Singh"),
     (@media_title, "cast", "Akshaye Khanna"),
@@ -285,11 +285,11 @@ VALUES
 # https://www.imdb.com/title/tt26443597
 SET @media_title = "Zootopia 2";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (7 + 100, @media_title, (60 * 1) + 48, "2025-11-26", "Brave rabbit cop Judy Hopps and her friend, the fox Nick Wilde, team up again to crack a new case, the most perilous and intricate of their careers.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Ginnifer Goodwin"),
     (@media_title, "cast", "Jason Bateman"),
@@ -326,11 +326,11 @@ VALUES
 # https://www.imdb.com/title/tt2948356
 SET @media_title = "Zootopia";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (8 + 100, @media_title, (60 * 1) + 48, "2016-03-04", "In a city of anthropomorphic animals, a rookie bunny cop and a cynical con artist fox must work together to uncover a conspiracy.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Ginnifer Goodwin"),
     (@media_title, "cast", "Jason Bateman"),
@@ -370,11 +370,11 @@ VALUES
 # https://www.imdb.com/title/tt33978029
 SET @media_title = "Ready or Not 2: Here I Come";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (9 + 100, @media_title, (60 * 1) + 48, "2026-03-20", "After surviving one deadly game, Grace and her sister Faith must now outrun four rival families competing for a powerful throne - winner takes all.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Samara Weaving"),
     (@media_title, "cast", "Kathryn Newton"),
@@ -409,11 +409,11 @@ VALUES
 # https://www.imdb.com/title/tt14905854
 SET @media_title = "Hamnet";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (10 + 100, @media_title, (60 * 2) + 5, "2025-12-05", "In late 16th-century England, Agnes, a healer sensitive to the world around her, builds a home with William, a local tutor and aspiring playwright. As their lives fracture, they are tested by distance, silence, and grief.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Jessie Buckley"),
     (@media_title, "cast", "Paul Mescal"),
@@ -447,11 +447,11 @@ VALUES
 # https://www.imdb.com/title/tt26443616
 SET @media_title = "Hoppers";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (11 + 100, @media_title, (60 * 1) + 44, "2026-03-06", "A 19-year-old animal lover uses technology that places her consciousness into a robotic beaver to uncover mysteries within the animal world beyond her imagination.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Piper Curda"),
     (@media_title, "cast", "Bobby Moynihan"),
@@ -487,11 +487,11 @@ VALUES
 # https://www.imdb.com/title/tt32916440
 SET @media_title = "Marty Supreme";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (12 + 100, @media_title, (60 * 2) + 29, "2025-12-25", "Marty Mauser, a young man with a dream no one respects, goes to hell and back in pursuit of greatness.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Timothée Chalamet"),
     (@media_title, "cast", "Gwyneth Paltrow"),
@@ -523,11 +523,11 @@ VALUES
 # https://www.imdb.com/title/tt1341338
 SET @media_title = "Good Luck, Have Fun, Don't Die";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (13 + 100, @media_title, (60 * 2) + 14, "2026-02-13", "A ""Man From the Future"" arrives at a diner in Los Angeles where he must recruit the precise combination of disgruntled patrons to join him on a one-night quest to save the world from the terminal threat of a rogue artificial intelligence.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Sam Rockwell"),
     (@media_title, "cast", "Juno Temple"),
@@ -560,11 +560,11 @@ VALUES
 # https://www.imdb.com/title/tt7798634
 SET @media_title = "Ready or Not";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (14 + 100, @media_title, (60 * 1) + 35, "2019-08-21", "A bride's wedding night takes a sinister turn when her eccentric new in-laws force her to take part in a terrifying game.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Samara Weaving"),
     (@media_title, "cast", "Adam Brody"),
@@ -600,11 +600,11 @@ VALUES
 # https://www.imdb.com/title/tt26581740
 SET @media_title = "Weapons";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (15 + 100, @media_title, (60 * 2) + 8, "2025-08-08", "When all but one child from the same class mysteriously vanish on the same night at exactly the same time, a community is left questioning who or what is behind their disappearance.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Julia Garner"),
     (@media_title, "cast", "Josh Brolin"),
@@ -635,11 +635,11 @@ VALUES
 # https://www.imdb.com/title/tt27047903
 SET @media_title = "Scream 7";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (16 + 100, @media_title, (60 * 1) + 49, "2026-02-27", "When a new Ghostface killer emerges in the town where Sidney Prescott has built a new life, her darkest fears are realized as her daughter becomes the next target.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Neve Campbell"),
     (@media_title, "cast", "Courteney Cox"),
@@ -672,11 +672,11 @@ VALUES
 # https://www.imdb.com/title/tt4729430
 SET @media_title = "Klaus";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (17 + 100, @media_title, (60 * 1) + 36, "2019-11-15", "A simple act of kindness always sparks another, even in a frozen, faraway place. When Smeerensburg's new postman, Jesper, befriends toymaker Klaus, their gifts melt an age-old feud and deliver a sleigh full of holiday traditions.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Jason Schwartzman"),
     (@media_title, "cast", "J.K. Simmons"),
@@ -713,11 +713,11 @@ VALUES
 # https://www.imdb.com/title/tt27543632
 SET @media_title = "The Housemaid";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (18 + 100, @media_title, (60 * 2) + 11, "2025-12-19", "A struggling young woman is relieved by the chance for a fresh start as a maid for a wealthy couple. Soon, she discovers that the family's secrets are far more dangerous than her own.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Sydney Sweeney"),
     (@media_title, "cast", "Amanda Seyfried"),
@@ -750,11 +750,11 @@ VALUES
 # https://www.imdb.com/title/tt33714084
 SET @media_title = "Reminders of Him";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (19 + 100, @media_title, (60 * 1) + 54, "2026-03-13", "After prison, a woman attempts to reconnect with her young daughter but faces resistance from everyone except a bar owner with ties to her child. As they grow closer, she must confront her past mistakes to build a hopeful future.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Maika Monroe"),
     (@media_title, "cast", "Tyriq Withers"),
@@ -786,11 +786,11 @@ VALUES
 # https://www.imdb.com/title/tt12300742
 SET @media_title = "Bugonia";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (20 + 100, @media_title, (60 * 1) + 58, "2025-10-31", "Two conspiracy-obsessed young men kidnap the high-powered CEO of a major company, convinced that she is an alien intent on destroying planet Earth.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Emma Stone"),
     (@media_title, "cast", "Jesse Plemons"),
@@ -824,11 +824,11 @@ VALUES
 # https://www.imdb.com/title/tt29567915
 SET @media_title = "Nuremberg";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (21 + 100, @media_title, (60 * 2) + 28, "2025-11-07", "A WWII psychiatrist evaluates Nazi leaders before the Nuremberg trials, growing increasingly obsessed with understanding evil as he forms a disturbing bond with Hermann Göring.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Rami Malek"),
     (@media_title, "cast", "Russell Crowe"),
@@ -863,11 +863,11 @@ VALUES
 # https://www.imdb.com/title/tt32897959
 SET @media_title = "Wuthering Heights";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (22 + 100, @media_title, (60 * 2) + 16, "2026-02-13", "A passionate and tumultuous love story set against the backdrop of the Yorkshire moors, exploring the intense and destructive relationship between Heathcliff and Catherine Earnshaw.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Margot Robbie"),
     (@media_title, "cast", "Jacob Elordi"),
@@ -899,11 +899,11 @@ VALUES
 # https://www.imdb.com/title/tt27714581
 SET @media_title = "Sentimental Value";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (23 + 100, @media_title, (60 * 2) + 13, "2025-08-20", "An intimate exploration of family, memories, and the reconciliatory power of art.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Renate Reinsve"),
     (@media_title, "cast", "Stellan Skarsgård"),
@@ -934,11 +934,11 @@ VALUES
 # https://www.imdb.com/title/tt32430579
 SET @media_title = "Crime 101";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (24 + 100, @media_title, (60 * 2) + 20, "2026-02-13", "An elusive thief, eyeing his final score, encounters a disillusioned insurance broker at her own crossroads. As their paths intertwine, a relentless detective trails them hoping to thwart the multi-million dollar heist they are planning.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Chris Hemsworth"),
     (@media_title, "cast", "Mark Ruffalo"),
@@ -971,11 +971,11 @@ VALUES
 # https://www.imdb.com/title/tt1312221
 SET @media_title = "Frankenstein";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (25 + 100, @media_title, (60 * 2) + 29, "2025-11-07", "Dr. Victor Frankenstein, a brilliant but egotistical scientist, brings a creature to life in a monstrous experiment that ultimately leads to the undoing of both the creator and his tragic creation.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Oscar Isaac"),
     (@media_title, "cast", "Jacob Elordi"),
@@ -1009,11 +1009,11 @@ VALUES
 # https://www.imdb.com/title/tt29768334
 SET @media_title = "Train Dreams";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (26 + 100, @media_title, (60 * 1) + 42, "2025-11-21", "Based on Denis Johnson's beloved novella, Train Dreams is the moving portrait of Robert Grainier, a logger and railroad worker who leads a life of unexpected depth and beauty in the rapidly-changing America of the early 20th Century.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Joel Edgerton"),
     (@media_title, "cast", "Clifton Collins Jr."),
@@ -1045,11 +1045,11 @@ VALUES
 # https://www.imdb.com/title/tt32880540
 SET @media_title = "Zeta";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (27 + 100, @media_title, (60 * 2) + 13, "2026-03-20", "A Spanish spy must track down a former spy involved in an undercover mission decades ago, while a Colombian agent is also after him. Secrets from the past are uncovered.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Mario Casas"),
     (@media_title, "cast", "Luis Zahera"),
@@ -1083,11 +1083,11 @@ VALUES
 # https://www.imdb.com/title/tt31514146
 SET @media_title = "I Swear";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (28 + 100, @media_title, (60 * 2) + 0, "2026-04-24", "John Davidson: diagnosed with Tourette's syndrome at a young age which alienated him from his peers, he struggled with a condition few people had witnessed.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Robert Aramayo"),
     (@media_title, "cast", "Peter Mullan"),
@@ -1118,11 +1118,11 @@ VALUES
 # https://www.imdb.com/title/tt28996126
 SET @media_title = "Nobody 2";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (29 + 100, @media_title, (60 * 1) + 29, "2025-08-15", "Suburban dad Hutch Mansell, a former lethal assassin, is pulled back into his violent past after thwarting a home invasion, setting off a chain of events.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Bob Odenkirk"),
     (@media_title, "cast", "Connie Nielsen"),
@@ -1156,11 +1156,11 @@ VALUES
 # https://www.imdb.com/title/tt27847051
 SET @media_title = "The Secret Agent";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (30 + 100, @media_title, (60 * 2) + 41, "2025-11-06", "Amid the political turmoil of 1977 Brazil, a technology expert is forced into hiding and seeks help from the underground resistance as he tries to flee the country with his young son.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Robson Andrade"),
     (@media_title, "cast", "Rubens Santos"),
@@ -1193,11 +1193,11 @@ VALUES
 # https://www.imdb.com/title/tt30851137
 SET @media_title = "The Bride!";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (31 + 100, @media_title, (60 * 2) + 6, "2026-03-06", "In 1930s Chicago, Frankenstein asks Dr. Euphronius to help create a companion. They give life to a murdered woman as the Bride, sparking romance, police interest, and radical social change.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Jessie Buckley"),
     (@media_title, "cast", "Christian Bale"),
@@ -1231,11 +1231,11 @@ VALUES
 # https://www.imdb.com/title/tt34381258
 SET @media_title = "Heel";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (32 + 100, @media_title, (60 * 1) + 50, "2026-03-06", "A 19-year-old criminal, Tommy, is kidnapped and forced into a rehabilitation process by a dysfunctional couple, Chris and Kathryn, who try to make him a ""good boy."" Tommy must find a way to escape.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Stephen Graham"),
     (@media_title, "cast", "Andrea Riseborough"),
@@ -1269,11 +1269,11 @@ VALUES
 # https://www.imdb.com/title/tt28083456
 SET @media_title = "Is This Thing On?";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (33 + 100, @media_title, (60 * 2) + 1, "2025-12-19", "As their marriage unravels, Alex faces middle age and divorce, seeking new purpose in the New York comedy scene. Meanwhile, his wife Tess confronts sacrifices made for their family, forcing them to navigate co-parenting and identities.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Will Arnett"),
     (@media_title, "cast", "Laura Dern"),
@@ -1306,11 +1306,11 @@ VALUES
 # https://www.imdb.com/title/tt3515878
 SET @media_title = "Do Not Enter";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (34 + 100, @media_title, (60 * 1) + 31, "2026-03-20", "A group of explorers investigate an old abandoned hotel, encountering a strange supernatural being and a competing group searching for a legendary hidden treasure.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Adeline Rudolph"),
     (@media_title, "cast", "Nicholas Hamilton"),
@@ -1335,11 +1335,11 @@ VALUES
 # https://www.imdb.com/title/tt31050594
 SET @media_title = "Mercy";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (35 + 100, @media_title, (60 * 1) + 39, "2026-01-23", "Set in the near future, a detective accused of murdering his wife has 90 minutes to prove his innocence to an advanced AI judge.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Chris Pratt"),
     (@media_title, "cast", "Rebecca Ferguson"),
@@ -1374,11 +1374,11 @@ VALUES
 # https://www.imdb.com/title/tt32357218
 SET @media_title = "Shelter";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (36 + 100, @media_title, (60 * 1) + 47, "2026-01-30", "Michael Mason is a recluse on a remote Scottish island who rescues a girl from the sea, unleashing a perilous sequence of events that culminate in an attack on his home, compelling him to face his turbulent history.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Jason Statham"),
     (@media_title, "cast", "Bodhi Rae Breathnach"),
@@ -1409,11 +1409,11 @@ VALUES
 # https://www.imdb.com/title/tt35892608
 SET @media_title = "Undertone";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (37 + 100, @media_title, (60 * 1) + 34, "2026-03-13", "The host of a popular paranormal podcast becomes haunted by terrifying recordings mysteriously sent her way.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Nina Kiri"),
     (@media_title, "cast", "Adam DiMarco"),
@@ -1441,11 +1441,11 @@ VALUES
 # https://www.imdb.com/title/tt15239678
 SET @media_title = "Dune: Part Two";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (38 + 100, @media_title, (60 * 2) + 46, "2024-03-01", "Paul Atreides unites with the Fremen while on a warpath of revenge against the conspirators who destroyed his family. Facing a choice between the love of his life and the fate of the universe, he endeavors to prevent a terrible future.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Timothée Chalamet"),
     (@media_title, "cast", "Zendaya"),
@@ -1480,11 +1480,11 @@ VALUES
 # https://www.imdb.com/title/tt39792948
 SET @media_title = "Louis Theroux: Inside the Manosphere";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (39 + 100, @media_title, (60 * 1) + 31, "2026-03-11", "The acclaimed documentarian gains rare, unrestricted access to explore a rising ultra-masculine network and its polarizing influencers.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Louis Theroux"),
     (@media_title, "cast", "Harrison Sullivan"),
@@ -1513,11 +1513,11 @@ VALUES
 # https://www.imdb.com/title/tt16311594
 SET @media_title = "F1: The Movie";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (40 + 100, @media_title, (60 * 2) + 35, "2025-06-27", "A Formula One driver comes out of retirement to mentor and team up with a younger driver.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Brad Pitt"),
     (@media_title, "cast", "Damson Idris"),
@@ -1550,11 +1550,11 @@ VALUES
 # https://www.imdb.com/title/tt1160419
 SET @media_title = "Dune: Part One";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (41 + 100, @media_title, (60 * 2) + 35, "2021-10-22", "Paul Atreides arrives on Arrakis after his father accepts the stewardship of the dangerous planet. However, chaos ensues after a betrayal as forces clash to control melange, a precious resource.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Timothée Chalamet"),
     (@media_title, "cast", "Rebecca Ferguson"),
@@ -1589,11 +1589,11 @@ VALUES
 # https://www.imdb.com/title/tt30387012
 SET @media_title = "Border 2";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (42 + 100, @media_title, (60 * 3) + 20, "2026-01-23", "Young Indian fighters prepared to protect their homeland from a greater threat during the 1971 Indo-Pak war.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Sunny Deol"),
     (@media_title, "cast", "Varun Dhawan"),
@@ -1627,11 +1627,11 @@ VALUES
 # https://www.imdb.com/title/tt0816692
 SET @media_title = "Interstellar";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (43 + 100, @media_title, (60 * 2) + 49, "2014-11-07", "When Earth becomes uninhabitable in the future, a farmer and ex-NASA pilot, Joseph Cooper, is tasked to pilot a spacecraft, along with a team of researchers, to find a new planet for humans.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Matthew McConaughey"),
     (@media_title, "cast", "Anne Hathaway"),
@@ -1664,11 +1664,11 @@ VALUES
 # https://www.imdb.com/title/tt29781139
 SET @media_title = "Lesbian Space Princess";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (44 + 100, @media_title, (60 * 1) + 27, "2025-11-18", "A space princess is thrust out of her sheltered life and into a galactic quest to save her bounty hunter ex-girlfriend from the Straight White Maliens.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Shabana Azeez"),
     (@media_title, "cast", "Bernie Van Tiel"),
@@ -1704,11 +1704,11 @@ VALUES
 # https://www.imdb.com/title/tt32141377
 SET @media_title = "28 Years Later: The Bone Temple";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (45 + 100, @media_title, (60 * 1) + 49, "2026-01-16", "As Spike is inducted into Jimmy Crystal's gang on the mainland, Dr. Kelson makes a discovery that could alter the world.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Jack O'Connell"),
     (@media_title, "cast", "Alfie Williams"),
@@ -1740,11 +1740,11 @@ VALUES
 # https://www.imdb.com/title/tt6791350
 SET @media_title = "Guardians of the Galaxy Vol. 3";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (46 + 100, @media_title, (60 * 2) + 30, "2023-05-05", "Still reeling from the loss of Gamora, Peter Quill rallies his team to defend the universe and one of their own - a mission that could mean the end of the Guardians if not successful.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Chris Pratt"),
     (@media_title, "cast", "Chukwudi Iwuji"),
@@ -1780,11 +1780,11 @@ VALUES
 # https://www.imdb.com/title/tt14181714
 SET @media_title = "The Bluff";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (47 + 100, @media_title, (60 * 1) + 43, "2026-02-25", "A Caribbean woman gets her secret past revealed when her island is invaded by vicious buccaneers.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Priyanka Chopra Jonas"),
     (@media_title, "cast", "Karl Urban"),
@@ -1818,11 +1818,11 @@ VALUES
 # https://www.imdb.com/title/tt0111161
 SET @media_title = "The Shawshank Redemption";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (48 + 100, @media_title, (60 * 2) + 22, "1994-10-14", "A wrongfully convicted banker forms a close friendship with a hardened convict over a quarter century while retaining his humanity through simple acts of compassion.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Tim Robbins"),
     (@media_title, "cast", "Morgan Freeman"),
@@ -1853,11 +1853,11 @@ VALUES
 # https://www.imdb.com/title/tt32642706
 SET @media_title = "The Rip";
 
-INSERT INTO `movies_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
+INSERT INTO `movie_source` (`media_id`, `media_title`, `movie_length_minutes`, `media_release_date`, `media_description`)
 VALUES
     (49 + 100, @media_title, (60 * 1) + 53, "2026-01-16", "A group of Miami cops discovers a stash of millions in cash, leading to distrust as outsiders learn about the huge seizure, making them question who to rely on.");
 
-INSERT INTO `people_source` (`media_title`, `person_in_media_job`, `person_full_name`)
+INSERT INTO `person_source` (`media_title`, `person_in_media_job`, `person_full_name`)
 VALUES
     (@media_title, "cast", "Matt Damon"),
     (@media_title, "cast", "Ben Affleck"),
@@ -1894,7 +1894,7 @@ SELECT
     `media_id`,
     CONCAT("The cover image for the movie """, `media_title`, """.")
 FROM
-    `movies_source`;
+    `movie_source`;
 
 INSERT INTO `media` (`media_id`, `media_title`, `media_cover_image_id`, `media_description`, `media_release_date`)
 SELECT
@@ -1904,28 +1904,28 @@ SELECT
     `media_description`,
     `media_release_date`
 FROM
-    `movies_source`;
+    `movie_source`;
 
 INSERT INTO `movies` (`media_id`, `movie_length_minutes`)
 SELECT
     `media_id`,
     `movie_length_minutes`
 FROM
-    `movies_source`;
+    `movie_source`;
 
 INSERT INTO `people` (`person_id`, `person_full_name`, `person_description`)
 SELECT
     (ROW_NUMBER() OVER ()) - 1 + 200,
     `person_full_name`,
     ""
-FROM `people_source`
+FROM `person_source`
 GROUP BY `person_full_name`;
 
 INSERT INTO `person_in_media_jobs` (`person_in_media_job_id`, `person_in_media_job`)
 SELECT
     (ROW_NUMBER() OVER ()) - 1,
     `person_in_media_job`
-FROM `people_source`
+FROM `person_source`
 GROUP BY `person_in_media_job`;
 
 INSERT INTO `people_in_media` (`person_id`, `media_id`, `person_in_media_job`)
@@ -1933,13 +1933,13 @@ SELECT
     `people`.`person_id`,
     `media`.`media_id`,
     `person_in_media_jobs`.`person_in_media_job_id`
-FROM `people_source`
+FROM `person_source`
 LEFT JOIN `people`
-    ON `people`.`person_full_name` = `people_source`.`person_full_name`
+    ON `people`.`person_full_name` = `person_source`.`person_full_name`
 LEFT JOIN `media`
-    ON `media`.`media_title` = `people_source`.`media_title`
+    ON `media`.`media_title` = `person_source`.`media_title`
 LEFT JOIN `person_in_media_jobs`
-    ON `person_in_media_jobs`.`person_in_media_job` = `people_source`.`person_in_media_job`;
+    ON `person_in_media_jobs`.`person_in_media_job` = `person_source`.`person_in_media_job`;
 
 INSERT INTO `genres` (`genre_id`, `genre`)
 SELECT
@@ -1948,7 +1948,7 @@ SELECT
 FROM `genre_source`
 GROUP BY `genre`;
 
-INSERT INTO `genre_of_media` (`media_id`, `genre`)
+INSERT INTO `genres_of_media` (`media_id`, `genre`)
 SELECT
     `media`.`media_id`,
     `genres`.`genre_id`
@@ -1958,8 +1958,8 @@ LEFT JOIN `media`
 LEFT JOIN `genres`
     ON `genres`.`genre` = `genre_source`.`genre`;
 
-DROP TEMPORARY TABLE `movies_source`;
-DROP TEMPORARY TABLE `people_source`;
+DROP TEMPORARY TABLE `movie_source`;
+DROP TEMPORARY TABLE `person_source`;
 DROP TEMPORARY TABLE `genre_source`;
 
 COMMIT;

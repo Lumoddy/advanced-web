@@ -38,23 +38,26 @@
         }
 
         /**
-         * @param array{username: string, email: string, password_hash: string} $account
-         * @return array{id: int, username: string, email: string, password_hash: string}
+         * @param string $username
+         * @param string $email
+         * @param string $password
+         * @return int
          * @throws mysqli_sql_exception
          */
-        public function insert_account_with_unique_id(array $account): array
+        public function insert_account_with_unique_id(
+            string $username,
+            string $email,
+            string $password_hash): int
         {
-            $entry =
-            [
-                "id" => $this->unique_id_in("accounts", "account_id"),
-                "username" => $account["username"],
-                "email" => $account["email"],
-                "password_hash" => $account["password_hash"],
-            ];
+            $id = $this->unique_id_in("accounts", "account_id");
 
-            $this->insert_accounts($entry);
+            $this->insert_account_id_and_username_and_email_and_password_hash(
+                $id,
+                $username,
+                $email,
+                $password_hash);
 
-            return $entry;
+            return $id;
         }
 
         /**

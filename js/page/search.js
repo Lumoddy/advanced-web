@@ -1,31 +1,52 @@
 let previousSearchCancel = null;
 const forMoviesForm = document.getElementById("search-for-movies");
 const searchResultsContainer = document.getElementById("search-results");
+let starFilledIcon = null;
+let starIcon = null;
+const starFilledIconRequest = fetch("./part/star_filled_icon.php").then((x) => x.text());
+const starIconRequest = fetch("./part/star_icon.php").then((x) => x.text());
 function updateAsMovies(movies) {
     searchResultsContainer.replaceChildren();
     for (const movie of movies) {
-        const movieCard = document.createElement("a");
-        movieCard.setAttribute("class", "glass panel");
-        movieCard.setAttribute("href", `./media.php?id=${movie.id}`);
-        movieCard.setAttribute("style", "width: 140px; display: block");
-        {
-            const movieImg = document.createElement("img");
-            movieImg.setAttribute("src", `./img/${movie.cover_image_id}.jpg`);
-            movieImg.setAttribute("style", "width: 100%; aspect-ratio: 2/3");
-            movieCard.appendChild(movieImg);
-            const movieDiv = document.createElement("div");
-            movieDiv.setAttribute("style", "margin: 4px 8px 4px");
-            {
-                const movieName = document.createElement("h3");
-                movieName.setAttribute("style", "margin: 0; font-size: medium");
-                {
-                    movieName.appendChild(document.createTextNode(movie.title));
-                }
-                movieCard.appendChild(movieName);
-            }
-            movieCard.appendChild(movieDiv);
-        }
-        searchResultsContainer.appendChild(movieCard);
+        const fragment = document.createElement("div");
+        fragment.innerHTML = `
+            <a
+              class="glass panel"
+              href="./media.php?id=${movie.id}"
+              style="
+                width: 140px;
+                color: #FFFFFF;
+                text-decoration: none">
+              <img
+                src="./img/${movie.cover_image_id}.jpg"
+                style="width: 100%; aspect-ratio: 2/3">
+              <div style="margin: 4px 8px 4px;">
+                <h3
+                  style="margin: 0; font-size: medium">
+                  ${movie.title}
+                </h3>
+              </div>
+              <div
+                style="
+                  display: flex;
+                  flex-flow: row nowrap;
+                  justify-content: end;
+                  align-items: center">
+                ${movie.rating === null
+            ? `<span class="rating">(No ratings)</span>`
+            : `<span
+                          class="rating"
+                          style="font-size: small">(${movie.rating.toFixed(1)})</span>
+                        <rating-display class="small">
+                          <svg${movie.rating >= 0.5 ? starFilledIcon : starIcon}svg>
+                          <svg${movie.rating >= 1.5 ? starFilledIcon : starIcon}svg>
+                          <svg${movie.rating >= 2.5 ? starFilledIcon : starIcon}svg>
+                          <svg${movie.rating >= 3.5 ? starFilledIcon : starIcon}svg>
+                          <svg${movie.rating >= 4.5 ? starFilledIcon : starIcon}svg>
+                        </rating-display>`}
+              </div>
+            </a>`;
+        searchResultsContainer.append(...fragment.children);
     }
 }
 function requestUpdateAsMovies() {
@@ -36,11 +57,19 @@ function requestUpdateAsMovies() {
     previousSearchCancel = new AbortController();
     const signal = previousSearchCancel.signal;
     const timeout = setTimeout(async () => {
-        const url = new URL(`${location.origin}/${location.pathname.replace(/\/[^\/]+\/?$/, "")}/json/search_media.php`);
+        if (starFilledIcon === null)
+            starFilledIcon = await starFilledIconRequest;
+        if (starIcon === null)
+            starIcon = await starIconRequest;
+        const url = new URL(`${location.origin}${location.pathname.replace(/\/[^\/]+$/, "")}/json/search_media.php`);
+        const replaceUrl = new URL(`${location.origin}${location.pathname}`);
         for (const [name, value] of new FormData(forMoviesForm)) {
-            if (typeof value === "string")
+            if (typeof value === "string") {
                 url.searchParams.append(name, value);
+                replaceUrl.searchParams.append(name, value);
+            }
         }
+        history.replaceState(undefined, "", replaceUrl);
         const response = await (await fetch(url, { signal, method: "get" }))
             .json();
         if (signal.aborted)
